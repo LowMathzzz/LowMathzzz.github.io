@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mateo Loechle — Software Engineer · Backend &amp; Mobile</title>
+<meta name="description" content="Portfolio de Mateo Loechle, Software Engineer en Lima, Perú. Backend con Java y Spring Boot, apps con Flutter y cloud en AWS. Un portfolio que es una pecera.">
+<meta name="author" content="Mateo Italo Loechle Arias">
+<meta name="theme-color" content="#0b3a35">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://lowmath.dev/">
+<meta property="og:title" content="Mateo Loechle — Software Engineer">
+<meta property="og:description" content="Backend &amp; Mobile — Java/Spring • Flutter • AWS. Un portfolio que es una pecera pixel art.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+<script>(function (d, n) { var c = d.documentElement.classList; c.add('js');   // modo liviano: táctil, pantalla chica, pocos núcleos o ahorro de datos
+  if (matchMedia('(pointer: coarse)').matches || innerWidth < 700 || (n.hardwareConcurrency || 8) <= 4 || (n.connection && n.connection.saveData)) c.add('lite'); })(document, navigator)</script>
+</head>
+<body>
+<a class="skip" href="#main" data-i18n="skip">Saltar al contenido</a>
+
+<div class="sea-wrap" id="sea-wrap" aria-hidden="true"><canvas id="sea"></canvas><canvas id="sea-ui"></canvas></div>
+<svg class="defs" aria-hidden="true" focusable="false">
+  <filter id="wobble" x="-5%" y="-15%" width="110%" height="130%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.008 0.07" numOctaves="2" seed="7"/>
+    <feDisplacementMap in="SourceGraphic" scale="10" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+</svg>
+
+<header class="nav" id="nav">
+  <a class="brand" href="#top" aria-label="lowmath.dev — inicio">
+    <svg class="fish-ico" viewBox="0 0 16 10" aria-hidden="true"><path fill="#ffd25a" d="M3 3h1v1h1V3h1V2h5v1h2v1h1v2h-1v1h-2v1H6V7H5V6H4v1H3V6H2V4h1z"/><path fill="#0b2624" d="M11 4h1v1h-1z"/><path fill="#ff8a2a" d="M0 2h2v2H1v2h1v2H0z"/></svg>
+    <span>lowmath<b>.dev</b></span>
+  </a>
+  <nav class="nav-links" id="nav-links" aria-label="Secciones">
+    <a href="#about" data-i18n="nav.about">Sobre mí</a>
+    <a href="#stack" data-i18n="nav.stack">Stack</a>
+    <a href="#experience" data-i18n="nav.exp">Experiencia</a>
+    <a href="#projects" data-i18n="nav.projects">Proyectos</a>
+    <a href="#contact" data-i18n="nav.contact">Contacto</a>
+  </nav>
+  <div class="nav-tools">
+    <div class="seg" role="group" aria-label="Idioma / Language">
+      <button type="button" data-lang="es" aria-pressed="true">ES</button>
+      <button type="button" data-lang="en" aria-pressed="false">EN</button>
+    </div>
+    <button type="button" class="icon-btn" id="theme-btn" aria-label="Ciclo día/noche"><span aria-hidden="true">◐</span></button>
+    <a class="btn btn-sm" href="assets/CV-Mateo-Loechle.pdf" download>CV <span aria-hidden="true">↓</span></a>
+    <button type="button" class="icon-btn menu-btn" id="menu-btn" aria-expanded="false" aria-controls="nav-links" aria-label="Menú" data-i18n-attr="aria-label:nav.menu"><span aria-hidden="true">≡</span></button>
+  </div>
+</header>
+
+<nav class="gauge" aria-label="Profundidad" data-i18n-attr="aria-label:gauge">
+  <p class="gauge-title" data-i18n="gauge">Profundidad</p>
+  <div class="gauge-track">
+    <span class="gauge-fill"></span>
+    <span class="gauge-fish" aria-hidden="true"><svg viewBox="0 0 16 10"><path fill="#ffd25a" d="M3 3h1v1h1V3h1V2h5v1h2v1h1v2h-1v1h-2v1H6V7H5V6H4v1H3V6H2V4h1z"/><path fill="#0b2624" d="M11 4h1v1h-1z"/><path fill="#ff8a2a" d="M0 2h2v2H1v2h1v2H0z"/></svg></span>
+    <ol class="gauge-marks">
+      <li><a href="#top" data-sec="top"><i></i><span data-i18n="g.top">Superficie</span></a></li>
+      <li><a href="#about" data-sec="about"><i></i><span data-i18n="nav.about">Sobre mí</span></a></li>
+      <li><a href="#stack" data-sec="stack"><i></i><span>Stack</span></a></li>
+      <li><a href="#experience" data-sec="experience"><i></i><span data-i18n="nav.exp">Experiencia</span></a></li>
+      <li><a href="#projects" data-sec="projects"><i></i><span data-i18n="nav.projects">Proyectos</span></a></li>
+      <li><a href="#pearls" data-sec="pearls"><i></i><span data-i18n="g.pearls">Perlas</span></a></li>
+      <li><a href="#contact" data-sec="contact"><i></i><span data-i18n="nav.contact">Contacto</span></a></li>
+    </ol>
+  </div>
+  <p class="gauge-read"><b id="depth-val">0</b> cm</p>
+</nav>
+
+<main id="main">
+
+  <!-- ============ SUPERFICIE ============ -->
+  <section id="top" class="hero">
+    <div class="wrap hero-inner">
+      <p class="status"><span class="pulse" aria-hidden="true"></span><span data-i18n="hero.status">Disponible para trabajar · Lima, Perú · Remoto</span></p>
+      <p class="kicker" data-i18n="hero.kicker">Hola, soy</p>
+      <h1 class="name" id="name">
+        <span class="sr-only">Mateo Loechle</span>
+        <span class="name-a" aria-hidden="true">Mateo <em>Loechle</em></span>
+        <span class="name-b" aria-hidden="true"><span>Mateo <em>Loechle</em></span></span>
+      </h1>
+      <p class="role">Software Engineer <span aria-hidden="true">/</span> Backend &amp; Mobile</p>
+      <p class="lede" data-i18n="hero.lede">Construyo backends seguros y apps multiplataforma: APIs REST, WebSockets y arquitecturas limpias que escalan.</p>
+      <ul class="hero-stack" aria-label="Stack principal" data-i18n-attr="aria-label:hero.stack">
+        <li>Java</li><li>Spring Boot</li><li>Flutter</li><li>AWS</li><li>Docker</li><li>PostgreSQL</li>
+      </ul>
+      <div class="ctas">
+        <a class="btn" href="#projects" data-i18n="hero.cta1">Ver proyectos →</a>
+        <a class="btn btn-ghost" href="#contact" data-i18n="hero.cta2">Hablemos</a>
+      </div>
+    </div>
+    <div class="wrap hero-foot">
+      <p class="hud" aria-live="off"><span>26 °C</span><span>pH 7.0</span><span id="hud-time">--:--</span><span id="hud-mode">—</span><span><b id="hud-fish">0</b> <span data-i18n="hud.fish">peces</span></span></p>
+      <p class="hint" data-i18n="hero.hint">Esto es una pecera de verdad: <b>clic</b> para dar de comer, pasa el mouse rápido y huyen, quédate quieto y se acercan. <b>F</b> alimenta · <b>T</b> toc toc.</p>
+      <a class="dive" href="#about"><span data-i18n="hero.dive">Bucea</span> <span class="arrow" aria-hidden="true">↓</span></a>
+    </div>
+  </section>
+
+  <div class="ticker" aria-hidden="true"><div class="ticker-band">
+    <div class="ticker-track">
+      <span>Java</span><span>Spring Boot</span><span>Flutter</span><span>AWS</span><span>Docker</span><span>Kotlin</span><span>PostgreSQL</span><span>Kafka</span><span>Redis</span><span>MongoDB</span><span>GitHub Actions</span><span>Jenkins</span><span>Grafana</span><span>Angular</span><span>React</span><span>Vue</span><span>JUnit</span><span>Mockito</span>
+    </div>
+  </div></div>
+
+  <!-- ============ 01 SOBRE MÍ ============ -->
+  <section id="about" class="section">
+    <div class="wrap">
+      <header class="sec-head reveal">
+        <span class="sec-num">01</span>
+        <h2 data-i18n="about.title">Sobre mí</h2>
+        <span class="sec-depth">▼ <b data-depth="about">0</b> cm</span>
+      </header>
+      <div class="about-grid">
+        <div class="panel about-text reveal">
+          <p class="big" data-i18n="about.p0">Ingeniero de software en Lima, Perú. Construyo la parte que no se ve —APIs, datos y seguridad— para que todo lo demás funcione.</p>
+          <p data-i18n="about.p1">Backend developer con foco en <strong>Java y Spring Boot</strong>: APIs REST, WebSockets, WebHooks, modelado de datos y seguridad con JWT. También desarrollo apps móviles multiplataforma con <strong>Flutter</strong> y he trabajado en proyectos web con Angular, Vue y React.</p>
+          <p data-i18n="about.p2">Trabajo con <strong>AWS</strong> (EC2, Lambda), Docker y CI/CD en GitHub Actions y Jenkins, con observabilidad en Grafana. Me gustan las arquitecturas limpias y escalables —microservicios, event-driven, hexagonal, Clean Architecture— respaldadas por pruebas en JUnit y Mockito.</p>
+          <ul class="facts">
+            <li><b>8</b><span data-i18n="about.f1">lenguajes</span></li>
+            <li><b>5</b><span data-i18n="about.f2">certificaciones</span></li>
+            <li><b>1</b><span data-i18n="about.f3">CRM entregado de punta a punta</span></li>
+            <li><b>B2</b><span data-i18n="about.f4">inglés profesional</span></li>
+          </ul>
+        </div>
+        <aside class="panel species reveal" aria-labelledby="species-name">
+          <div class="species-head">
+            <svg class="species-fish" viewBox="0 0 16 10" aria-hidden="true"><path fill="#ffd25a" d="M3 3h1v1h1V3h1V2h5v1h2v1h1v2h-1v1h-2v1H6V7H5V6H4v1H3V6H2V4h1z"/><path fill="#0b2624" d="M11 4h1v1h-1z"/><path fill="#ff8a2a" d="M0 2h2v2H1v2h1v2H0z"/></svg>
+            <div>
+              <p class="tiny" data-i18n="about.card">Ficha de la especie</p>
+              <p class="sp-name" id="species-name">Mateo Italo Loechle Arias</p>
+              <p class="sp-sci"><i>Homo backendensis</i></p>
+            </div>
+          </div>
+          <dl>
+            <div><dt data-i18n="about.k1">Hábitat</dt><dd data-i18n="about.v1">Lima, Perú · abierto a remoto</dd></div>
+            <div><dt data-i18n="about.k2">Dieta</dt><dd data-i18n="about.v2">APIs REST, WebSockets y código bien testeado</dd></div>
+            <div><dt data-i18n="about.k3">Comportamiento</dt><dd data-i18n="about.v3">Curioso. Nada hacia los problemas difíciles y no los suelta hasta entregarlos.</dd></div>
+            <div><dt data-i18n="about.k4">Idiomas</dt><dd data-i18n="about.v4">Español (nativo) · Inglés (B2)</dd></div>
+            <div><dt data-i18n="about.k5">Formación</dt><dd data-i18n="about.v5">Ing. de Software — UPC (2022 – 2027)</dd></div>
+            <div><dt data-i18n="about.k6">Estado</dt><dd class="ok"><span class="pulse" aria-hidden="true"></span><span data-i18n="about.v6">Disponible para nuevos retos</span></dd></div>
+          </dl>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 02 STACK ============ -->
+  <section id="stack" class="section">
+    <div class="wrap">
+      <header class="sec-head reveal">
+        <span class="sec-num">02</span>
+        <h2 data-i18n="stack.title">Cardumen tecnológico</h2>
+        <span class="sec-depth">▼ <b data-depth="stack">0</b> cm</span>
+      </header>
+      <p class="sec-sub reveal" data-i18n="stack.sub">Cada pez es una tecnología con la que trabajo. Filtra por categoría, pasa el mouse por la lista o tira comida dentro de la pecera.</p>
+      <div class="panel stack-panel reveal">
+        <div class="chips" role="group" aria-label="Filtrar por categoría" data-i18n-attr="aria-label:stack.filter">
+          <button type="button" class="chip" data-cat="all" aria-pressed="true" data-i18n="cat.all">Todos</button>
+          <button type="button" class="chip" data-cat="lang" aria-pressed="false" data-i18n="cat.lang">Lenguajes</button>
+          <button type="button" class="chip" data-cat="back" aria-pressed="false">Backend &amp; testing</button>
+          <button type="button" class="chip" data-cat="cloud" aria-pressed="false">Cloud &amp; DevOps</button>
+          <button type="button" class="chip" data-cat="data" aria-pressed="false" data-i18n="cat.data">Datos</button>
+          <button type="button" class="chip" data-cat="front" aria-pressed="false">Front &amp; Mobile</button>
+        </div>
+        <div class="stack-grid">
+          <div class="tank" id="tech-tank" title="Clic: comida · mouse rápido: huyen" data-i18n-attr="title:tank.title">
+            <canvas class="tk" aria-hidden="true"></canvas>
+            <canvas class="tku" aria-hidden="true"></canvas>
+            <span class="tank-label" aria-hidden="true">tech.tank — 30 🐟</span>
+          </div>
+          <ul class="tech-list" id="tech-list">
+            <li data-tech="Java" data-cat="lang"><i style="--c:#f89820"></i>Java</li>
+            <li data-tech="Kotlin" data-cat="lang"><i style="--c:#7f52ff"></i>Kotlin</li>
+            <li data-tech="Dart" data-cat="lang"><i style="--c:#13b9fd"></i>Dart</li>
+            <li data-tech="Python" data-cat="lang"><i style="--c:#ffd43b"></i>Python</li>
+            <li data-tech="TypeScript" data-cat="lang"><i style="--c:#3178c6"></i>TypeScript</li>
+            <li data-tech="JavaScript" data-cat="lang"><i style="--c:#f7df1e"></i>JavaScript</li>
+            <li data-tech="C#" data-cat="lang"><i style="--c:#9b4f96"></i>C#</li>
+            <li data-tech="C++" data-cat="lang"><i style="--c:#659ad2"></i>C++</li>
+            <li data-tech="Spring Boot" data-cat="back"><i style="--c:#6db33f"></i>Spring Boot</li>
+            <li data-tech="Kafka" data-cat="back"><i style="--c:#e8e8e8"></i>Kafka</li>
+            <li data-tech="JUnit" data-cat="back"><i style="--c:#25a162"></i>JUnit</li>
+            <li data-tech="Mockito" data-cat="back"><i style="--c:#9fd36b"></i>Mockito</li>
+            <li data-tech="Stripe" data-cat="back"><i style="--c:#635bff"></i>Stripe</li>
+            <li data-tech="Culqi" data-cat="back"><i style="--c:#00a19b"></i>Culqi</li>
+            <li data-tech="SendGrid" data-cat="back"><i style="--c:#1a82e2"></i>SendGrid</li>
+            <li data-tech="AWS" data-cat="cloud"><i style="--c:#ff9900"></i>AWS <small>EC2 · Lambda</small></li>
+            <li data-tech="Azure" data-cat="cloud"><i style="--c:#0078d4"></i>Azure</li>
+            <li data-tech="Docker" data-cat="cloud"><i style="--c:#2496ed"></i>Docker</li>
+            <li data-tech="GitHub Actions" data-cat="cloud"><i style="--c:#2088ff"></i>GitHub Actions</li>
+            <li data-tech="Jenkins" data-cat="cloud"><i style="--c:#d24939"></i>Jenkins</li>
+            <li data-tech="Linux" data-cat="cloud"><i style="--c:#fcc624"></i>Linux</li>
+            <li data-tech="Grafana" data-cat="cloud"><i style="--c:#f46800"></i>Grafana</li>
+            <li data-tech="PostgreSQL" data-cat="data"><i style="--c:#336791"></i>PostgreSQL</li>
+            <li data-tech="MongoDB" data-cat="data"><i style="--c:#47a248"></i>MongoDB</li>
+            <li data-tech="Redis" data-cat="data"><i style="--c:#dc382d"></i>Redis</li>
+            <li data-tech="SQL" data-cat="data"><i style="--c:#e38c00"></i>SQL</li>
+            <li data-tech="Flutter" data-cat="front"><i style="--c:#54c5f8"></i>Flutter</li>
+            <li data-tech="Angular" data-cat="front"><i style="--c:#dd0031"></i>Angular</li>
+            <li data-tech="Vue" data-cat="front"><i style="--c:#42b883"></i>Vue</li>
+            <li data-tech="React" data-cat="front"><i style="--c:#61dafb"></i>React</li>
+          </ul>
+        </div>
+        <div class="pill-rows">
+          <div>
+            <h3 data-i18n="stack.arch">Arquitectura y patrones</h3>
+            <ul class="pills"><li>MVC</li><li data-i18n="pill.micro">Microservicios</li><li>Event-driven</li><li data-i18n="pill.hex">Hexagonal</li><li>Clean Architecture</li><li>REST APIs</li><li>WebSockets</li><li>WebHooks</li></ul>
+          </div>
+          <div>
+            <h3 data-i18n="stack.method">Metodologías y herramientas</h3>
+            <ul class="pills"><li>Git</li><li>Git Flow</li><li>Maven</li><li>Scrum</li><li>PMBOK</li><li>CI/CD</li></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 03 EXPERIENCIA ============ -->
+  <section id="experience" class="section">
+    <div class="wrap">
+      <header class="sec-head reveal">
+        <span class="sec-num">03</span>
+        <h2 data-i18n="exp.title">Bitácora</h2>
+        <span class="sec-depth">▼ <b data-depth="experience">0</b> cm</span>
+      </header>
+      <p class="sec-sub reveal" data-i18n="exp.sub">Dónde he nadado: experiencia y formación.</p>
+      <ol class="timeline">
+        <li class="tl-item reveal">
+          <span class="tl-dot" aria-hidden="true"></span>
+          <article class="panel tl-card">
+            <p class="tl-meta"><span data-i18n="exp.a.when">Dic 2025 — Sep 2026</span><span data-i18n="exp.a.where">Lima, Perú · remoto</span></p>
+            <h3>Software Engineer <span class="at">@ Arias y Arias Corredores de Seguros</span></h3>
+            <p class="tl-note" data-i18n="exp.a.note">Remoto, con presencialidad ocasional</p>
+            <ul class="bul">
+              <li data-i18n="exp.a.b1">Desarrollé de punta a punta <strong>AAS-NET</strong>, un CRM para corredores de seguros que centraliza pólizas, cuotas y vencimientos, siniestros, clientes y subagentes, y reportes exportables.</li>
+              <li data-i18n="exp.a.b2">Construí el backend monolítico de la plataforma: lógica de negocio, API REST y modelo de datos para operar toda la cartera desde un solo sistema.</li>
+              <li data-i18n="exp.a.b3">Aseguré la API con autenticación JWT y estándares de hardening, con acceso por roles y permisos para subagentes, administrativos y gerentes.</li>
+              <li data-i18n="exp.a.b4">Implementé el cifrado de la base de datos y reforcé la seguridad del frontend para proteger la información sensible de clientes y pólizas.</li>
+              <li data-i18n="exp.a.b5">Entregué el sistema completo hasta su culminación, trabajando de forma remota y coordinando con el equipo en sitio cuando fue necesario.</li>
+            </ul>
+            <ul class="tags"><li data-i18n="tag.rest">API REST</li><li>JWT</li><li data-i18n="tag.rbac">Roles y permisos</li><li data-i18n="tag.enc">Cifrado de BD</li><li>Hardening</li><li data-i18n="tag.reports">Reportes</li></ul>
+          </article>
+        </li>
+        <li class="tl-item reveal">
+          <span class="tl-dot edu" aria-hidden="true"></span>
+          <article class="panel tl-card">
+            <p class="tl-meta"><span data-i18n="exp.b.when">Mar 2022 — 2027 (graduación estimada)</span><span data-i18n="exp.b.where">Lima, Perú</span></p>
+            <h3><span data-i18n="exp.b.title">Bachiller en Ingeniería de Software</span> <span class="at">@ UPC</span></h3>
+            <p class="tl-note" data-i18n="exp.b.note">Universidad Peruana de Ciencias Aplicadas · en curso</p>
+            <ul class="bul">
+              <li data-i18n="exp.b.b1">Apliqué principios de ingeniería de software, ciclo de vida del desarrollo (SDLC), diseño y pruebas para construir soluciones sólidas y fáciles de mantener.</li>
+              <li data-i18n="exp.b.b2">Profundicé en estructuras de datos avanzadas y análisis de algoritmos para optimizar el uso de tiempo y memoria.</li>
+              <li data-i18n="exp.b.b3">Diseñé modelos de datos en bases relacionales y NoSQL, priorizando consistencia, rendimiento y escalabilidad.</li>
+            </ul>
+            <ul class="tags"><li>SDLC</li><li data-i18n="tag.ds">Estructuras de datos</li><li data-i18n="tag.algo">Algoritmos</li><li>SQL &amp; NoSQL</li></ul>
+          </article>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============ 04 PROYECTOS ============ -->
+  <section id="projects" class="section">
+    <div class="wrap">
+      <header class="sec-head reveal">
+        <span class="sec-num">04</span>
+        <h2 data-i18n="projects.title">Proyectos</h2>
+        <span class="sec-depth">▼ <b data-depth="projects">0</b> cm</span>
+      </header>
+      <p class="sec-sub reveal" data-i18n="projects.sub">Lo que he construido, de la superficie al fondo.</p>
+
+      <article class="panel project reveal" id="p-aasnet">
+        <div class="p-visual">
+          <div class="mock mock-crm" aria-hidden="true">
+            <div class="mock-bar"><i></i><i></i><i></i><span>aas-net / pólizas</span><b>🔒 JWT</b></div>
+            <div class="mock-body">
+              <div class="mock-side"><span class="on"></span><span></span><span></span><span></span><span></span></div>
+              <div class="mock-main">
+                <div class="kpis"><div><em>Pólizas</em><s></s></div><div><em>Cuotas</em><s></s></div><div><em>Siniestros</em><s></s></div></div>
+                <div class="rows">
+                  <div><s></s><s></s><u class="ok"></u></div>
+                  <div><s></s><s></s><u class="warn"></u></div>
+                  <div><s></s><s></s><u class="ok"></u></div>
+                  <div><s></s><s></s><u class="bad"></u></div>
+                  <div><s></s><s></s><u class="ok"></u></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="p-body">
+          <p class="p-meta"><span class="p-num">01</span><span>Arias y Arias · 2025 — 2026</span><span class="badge" data-i18n="p1.badge">★ Experiencia profesional</span></p>
+          <h3 class="p-title">AAS-NET</h3>
+          <p class="p-sub" data-i18n="p1.sub">CRM para corredores de seguros</p>
+          <p data-i18n="p1.desc">Centraliza pólizas, cuotas y vencimientos, siniestros, clientes y subagentes, con reportes exportables. Lo construí de punta a punta y lo entregué completo.</p>
+          <ul class="bul">
+            <li data-i18n="p1.b1">Backend monolítico con API REST y un modelo de datos para operar toda la cartera desde un solo sistema.</li>
+            <li data-i18n="p1.b2">JWT y hardening, con roles y permisos para subagentes, administrativos y gerentes.</li>
+            <li data-i18n="p1.b3">Base de datos cifrada y frontend reforzado para proteger datos sensibles de clientes y pólizas.</li>
+          </ul>
+          <ul class="tags"><li data-i18n="tag.rest">API REST</li><li>JWT</li><li data-i18n="tag.rbac">Roles y permisos</li><li data-i18n="tag.enc">Cifrado de BD</li><li data-i18n="tag.reports">Reportes</li></ul>
+        </div>
+      </article>
+
+      <article class="panel project flip reveal" id="p-doxacore">
+        <div class="p-visual">
+          <div class="mock mock-doxa" aria-hidden="true">
+            <div class="mock-bar"><i></i><i></i><i></i><span>doxacore / planilla</span></div>
+            <div class="doxa-flow">
+              <div class="xls"><b>.xlsx</b><span></span><span></span><span></span><span></span></div>
+              <div class="pipe"><i></i><i></i><i></i></div>
+              <div class="chart"><s style="--h:45%"></s><s style="--h:70%"></s><s style="--h:55%"></s><s style="--h:88%"></s><s style="--h:62%"></s><s style="--h:76%"></s></div>
+            </div>
+            <div class="doxa-mods"><span data-i18n="p2.m1">Planilla</span><span data-i18n="p2.m2">Gastos</span><span data-i18n="p2.m3">Ventas</span><span data-i18n="p2.m4">Inventario</span></div>
+          </div>
+        </div>
+        <div class="p-body">
+          <p class="p-meta"><span class="p-num">02</span><span data-i18n="p2.when">Proyecto personal · 2025 — hoy</span></p>
+          <h3 class="p-title">DoxaCore</h3>
+          <p class="p-sub" data-i18n="p2.sub">Gestión operativa para restaurantes y parrillas</p>
+          <p data-i18n="p2.desc">Plataforma web modular: asistencia y planilla, gastos y cuentas por pagar, conciliación de ventas, inventarios con recetas y recepción de productos.</p>
+          <ul class="bul">
+            <li data-i18n="p2.b1">Automatiza el procesamiento de archivos Excel (biométrico, reportes de ventas, pedidos a proveedores) para calcular tardanzas, descuentos y sueldos.</li>
+            <li data-i18n="p2.b2">Seguridad por capas: cifrado de datos sensibles, control de acceso por roles, sesiones con expiración y protección contra abuso.</li>
+          </ul>
+          <ul class="tags"><li>Python</li><li>Flask</li><li>MySQL</li><li>pandas</li><li>Jinja2</li><li>Chart.js</li></ul>
+        </div>
+      </article>
+
+      <article class="panel project reveal" id="p-pecera">
+        <div class="p-visual">
+          <div class="tank tank-demo" id="demo-tank" title="Clic: comida" data-i18n-attr="title:tank.demo">
+            <canvas class="tk" aria-hidden="true"></canvas>
+            <span class="live"><span class="pulse" aria-hidden="true"></span><span data-i18n="p3.live">En vivo</span></span>
+          </div>
+        </div>
+        <div class="p-body">
+          <p class="p-meta"><span class="p-num">03</span><span data-i18n="p3.when">Proyecto personal · 2026</span></p>
+          <h3 class="p-title">Pecera Pixel</h3>
+          <p class="p-sub" data-i18n="p3.sub">Fondo de pantalla interactivo para Wallpaper Engine</p>
+          <p data-i18n="p3.desc">Una pecera pixel art que sigue la hora real de tu PC: peces, gambas y caracoles generados por código que comen, huyen, duermen y se esconden. Esta web corre sobre su motor.</p>
+          <ul class="bul">
+            <li data-i18n="p3.b1">11 especies de peces generadas proceduralmente (2D y voxel 3D), 19 variedades de gambas y comportamiento de cardumen con boids.</li>
+            <li data-i18n="p3.b2">Shader WebGL de vidrio, agua y luz: refracción, cáusticas, rayos de sol y ciclo día/noche.</li>
+          </ul>
+          <ul class="tags"><li>JavaScript</li><li>Canvas 2D</li><li>WebGL · GLSL</li><li>Boids</li><li data-i18n="tag.proc">Pixel art procedural</li></ul>
+          <button type="button" class="btn btn-ghost btn-sm" id="style-btn" data-i18n="p3.toggle">Ver los peces en voxel 3D</button>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============ 05 PERLAS ============ -->
+  <section id="pearls" class="section">
+    <div class="wrap">
+      <header class="sec-head reveal">
+        <span class="sec-num">05</span>
+        <h2 data-i18n="pearls.title">Perlas</h2>
+        <span class="sec-depth">▼ <b data-depth="pearls">0</b> cm</span>
+      </header>
+      <p class="sec-sub reveal" data-i18n="pearls.sub">Certificaciones y cursos. Cada certificación es una perla; cada curso, una concha. Una todavía se está formando.</p>
+      <ul class="pearls">
+        <li class="pearl reveal"><i class="ico" aria-hidden="true"></i><span class="pt" data-i18n="c.mongo">Introducción a MongoDB</span><span class="pk" data-i18n="k.cert">Certificación</span></li>
+        <li class="pearl reveal"><i class="ico" aria-hidden="true"></i><span class="pt" data-i18n="c.scrum">Fundamentos de Scrum</span><span class="pk" data-i18n="k.cert">Certificación</span></li>
+        <li class="pearl reveal"><i class="ico" aria-hidden="true"></i><span class="pt">Python</span><span class="pk" data-i18n="k.cert">Certificación</span></li>
+        <li class="pearl reveal"><i class="ico" aria-hidden="true"></i><span class="pt" data-i18n="c.java">Java (básico)</span><span class="pk" data-i18n="k.cert">Certificación</span></li>
+        <li class="pearl reveal"><i class="ico" aria-hidden="true"></i><span class="pt">Meta Social Media Marketing Professional</span><span class="pk" data-i18n="k.cert">Certificación</span></li>
+        <li class="pearl shell reveal"><i class="ico" aria-hidden="true"></i><span class="pt">Spring Boot</span><span class="pk" data-i18n="k.course">Curso</span></li>
+        <li class="pearl shell reveal"><i class="ico" aria-hidden="true"></i><span class="pt" data-i18n="c.flutter">Flutter — desarrollo móvil</span><span class="pk" data-i18n="k.course">Curso</span></li>
+        <li class="pearl shell reveal"><i class="ico" aria-hidden="true"></i><span class="pt" data-i18n="c.micro">Desarrollo de microservicios</span><span class="pk" data-i18n="k.course">Curso</span></li>
+        <li class="pearl forming reveal"><i class="ico" aria-hidden="true"></i><span class="pt" data-i18n="c.cyber">Analista de Ciberseguridad</span><span class="pk" data-i18n="k.wip">En proceso</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ 06 CONTACTO ============ -->
+  <section id="contact" class="section contact">
+    <div class="wrap">
+      <header class="sec-head reveal">
+        <span class="sec-num">06</span>
+        <h2 data-i18n="contact.title">Hablemos</h2>
+        <span class="sec-depth">▼ <b data-depth="contact">0</b> cm</span>
+      </header>
+      <div class="contact-grid">
+        <div class="panel contact-card reveal">
+          <p class="big" data-i18n="contact.big">¿Tienes un proyecto, un equipo o una idea que necesita backend sólido? Escríbeme.</p>
+          <p data-i18n="contact.sub">Disponible para roles de backend, mobile y full stack — remoto o en Lima.</p>
+          <ul class="links">
+            <li><button type="button" class="link-row" data-copy="mateoloechle@outlook.com"><span class="li-ico" aria-hidden="true">@</span><span class="li-main">mateoloechle@outlook.com</span><span class="li-act" data-i18n="contact.copy">copiar</span></button></li>
+            <li><a class="link-row" href="https://www.linkedin.com/in/mateo-italo-loechle-arias-186173329/" target="_blank" rel="noopener"><span class="li-ico" aria-hidden="true">in</span><span class="li-main">LinkedIn</span><span class="li-act">↗</span></a></li>
+            <li><a class="link-row" href="https://github.com/LowMathzzz" target="_blank" rel="noopener"><span class="li-ico" aria-hidden="true">gh</span><span class="li-main">github.com/LowMathzzz</span><span class="li-act">↗</span></a></li>
+            <li><a class="link-row" href="assets/CV-Mateo-Loechle.pdf" download><span class="li-ico" aria-hidden="true">cv</span><span class="li-main" data-i18n="contact.cv">Descargar CV (PDF)</span><span class="li-act">↓</span></a></li>
+          </ul>
+        </div>
+        <form class="panel bottle reveal" id="bottle">
+          <h3 data-i18n="form.title">Mensaje en una botella</h3>
+          <label><span data-i18n="form.name">Nombre</span><input name="name" required autocomplete="name" maxlength="80"></label>
+          <label><span>Email</span><input name="email" type="email" required autocomplete="email" maxlength="120"></label>
+          <label><span data-i18n="form.msg">Mensaje</span><textarea name="msg" rows="5" required maxlength="2000" placeholder="¿En qué estás trabajando?" data-i18n-attr="placeholder:form.ph"></textarea></label>
+          <button class="btn" type="submit" data-i18n="form.send">Lanzar la botella →</button>
+          <p class="form-note" data-i18n="form.note">Se abrirá tu correo con el mensaje listo para enviar.</p>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <p>© <span id="year">2026</span> Mateo Loechle · Lima, Perú</p>
+    <p data-i18n="foot">Hecho a mano con HTML, Canvas y WebGL. Sin frameworks, con peces.</p>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="js/sprites.js"></script>
+<script src="js/sea.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
