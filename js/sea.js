@@ -304,11 +304,11 @@ function buildName() {
     const b = w.getBoundingClientRect(), tx = w.textContent.toUpperCase(), X = b.left, Y = b.top + scrollY + asc;
     x.fillStyle = '#072320';                                                 // el mismo contorno que la mitad de arriba
     for (const [dx, dy] of [[o, 0], [-o, 0], [0, o], [0, -o], [o, o], [-o, o], [o, -o], [-o, -o]]) x.fillText(tx, X + dx, Y + dy);
-    x.fillStyle = night ? '#cfdcf4' : '#d6f5ee'; x.fillText(tx, X, Y);
+    x.fillStyle = w.classList.contains('gold') ? '#e0cf72' : night ? '#cfdcf4' : '#d6f5ee'; x.fillText(tx, X, Y);   // LOECHLE sigue dorado bajo el agua
   }
   x.globalCompositeOperation = 'source-atop';                                // más hondo, más teñido por el agua
   const g = x.createLinearGradient(0, NAME.split, 0, NAME.bot);
-  g.addColorStop(0, 'rgba(160,230,215,0)'); g.addColorStop(1, night ? 'rgba(40,70,140,.55)' : 'rgba(25,115,105,.5)');
+  g.addColorStop(0, 'rgba(160,230,215,0)'); g.addColorStop(1, night ? 'rgba(40,70,140,.55)' : 'rgba(25,115,105,.32)');
   x.fillStyle = g; x.fillRect(0, NAME.split, SEA.vw, H); x.globalCompositeOperation = 'source-over';
   NAME.night = night; NAME.ok = true;
 }
@@ -840,7 +840,7 @@ new ResizeObserver(relayout).observe(document.body);
 if (document.fonts) document.fonts.ready.then(layout);
 
 /* ---------- MOUSE Y TECLADO ---------- */
-const NOFEED = 'a,button,input,textarea,select,label,summary,.sheet,.tabs,.tank,.nav,.gauge,[data-nofeed]';
+const NOFEED = 'a,button,input,textarea,select,label,summary,.panel,.tabs,.tank,.nav,.gauge,[data-nofeed]';
 addEventListener('pointermove', e => {
   if (e.pointerType === 'touch') return;
   const x = e.clientX, y = e.clientY + scrollY, dt = Math.max(1e-3, tNow - M.t), speed = Math.hypot(x - M.x, y - M.y) / dt;
@@ -1012,6 +1012,9 @@ class Tank {
 
 /* ---------- INMERSIÓN: al cruzar la superficie el agua se agita un momento y suben burbujas de a poco ---------- */
 let diveT = 99;
+const diveFx = document.getElementById('dive-fx');
+function diveSweep(down) { if (!diveFx) return; diveFx.className = 'dive-fx'; void diveFx.offsetWidth; diveFx.className = 'dive-fx ' + (down ? 'down' : 'up'); }
+if (diveFx) diveFx.addEventListener('animationend', () => { diveFx.className = 'dive-fx'; });   // fuera de la animación no ocupa capa
 const diveWave = t => t < .45 ? smooth(0, .45, t) : Math.exp(-(t - .45) * 1.5);   // sube suave y se apaga lento
 
 /* ---------- LOOP ---------- */
@@ -1036,7 +1039,7 @@ function frame(now) {
     composeSky(t); if (gl) upload(0, texSky, skyC, false);
   }
   const sub = top > SEA.surf - 30;                                           // la línea del agua ya pasó el borde superior
-  if (SEA.sub !== undefined && sub !== SEA.sub && !SEA.reduced) diveT = 0;
+  if (SEA.sub !== undefined && sub !== SEA.sub && !SEA.reduced) { diveT = 0; if (!paused) diveSweep(sub); }
   SEA.sub = sub; diveT += dt; SEA.waveBoost = diveWave(diveT);
   if (diveT < 1.2 && BG.bubbles.length < 260 && Math.random() < dt * (SEA.lite ? 14 : 28))
     BG.bubbles.push({ x: rnd(0, SEA.vw), y: top + SEA.vh * rnd(.8, 1.1), r: rnd(0, 2) | 0, v: rnd(110, 220), ph: rnd(0, 6) });
