@@ -304,7 +304,7 @@ function buildName() {
     const b = w.getBoundingClientRect(), tx = w.textContent.toUpperCase(), X = b.left, Y = b.top + scrollY + asc;
     x.fillStyle = '#072320';                                                 // el mismo contorno que la mitad de arriba
     for (const [dx, dy] of [[o, 0], [-o, 0], [0, o], [0, -o], [o, o], [-o, o], [o, -o], [-o, -o]]) x.fillText(tx, X + dx, Y + dy);
-    x.fillStyle = w.classList.contains('gold') ? '#e0cf72' : night ? '#cfdcf4' : '#d6f5ee'; x.fillText(tx, X, Y);   // LOECHLE sigue dorado bajo el agua
+    x.fillStyle = w.classList.contains('gold') ? getComputedStyle(document.documentElement).getPropertyValue('--gold').trim() : night ? '#cfdcf4' : '#d6f5ee'; x.fillText(tx, X, Y);   // LOECHLE sigue dorado bajo el agua
   }
   x.globalCompositeOperation = 'source-atop';                                // más hondo, más teñido por el agua
   const g = x.createLinearGradient(0, NAME.split, 0, NAME.bot);
@@ -840,6 +840,7 @@ new ResizeObserver(relayout).observe(document.body);
 if (document.fonts) document.fonts.ready.then(layout);
 
 /* ---------- MOUSE Y TECLADO ---------- */
+const ACCENT = () => getComputedStyle(document.documentElement).getPropertyValue('--gold').trim() || '#6fe3cf';
 const NOFEED = 'a,button,input,textarea,select,label,summary,.panel,.tabs,.tank,.nav,.gauge,[data-nofeed]';
 addEventListener('pointermove', e => {
   if (e.pointerType === 'touch') return;
@@ -1005,7 +1006,7 @@ class Tank {
       const hot = isHot(f); if (!hot && this.filter !== 'all' && f.cat !== this.filter) continue;
       const y = f.y - f.ph * .42 - 4, w = f.lw || (f.lw = u.measureText(f.label).width + 12), bx = [f.x - w / 2, y - 13, w, 18];
       if (!hot && boxes.some(b => bx[0] < b[0] + b[2] + 2 && b[0] < bx[0] + bx[2] + 2 && bx[1] < b[1] + b[3] && b[1] < bx[1] + bx[3])) continue;
-      boxes.push(bx); tag(u, f.label, f.x, y, hot ? '#ffd25a' : '#fff', (hot ? 1 : this.filter === 'all' ? .8 : 1) * Math.min(1, f.alpha * 1.5), w);
+      boxes.push(bx); tag(u, f.label, f.x, y, hot ? ACCENT() : '#fff', (hot ? 1 : this.filter === 'all' ? .8 : 1) * Math.min(1, f.alpha * 1.5), w);
     }
   }
 }
@@ -1013,8 +1014,14 @@ class Tank {
 /* ---------- INMERSIÓN: al cruzar la superficie el agua se agita un momento y suben burbujas de a poco ---------- */
 let diveT = 99;
 const diveFx = document.getElementById('dive-fx');
-function diveSweep(down) { if (!diveFx) return; diveFx.className = 'dive-fx'; void diveFx.offsetWidth; diveFx.className = 'dive-fx ' + (down ? 'down' : 'up'); }
-if (diveFx) diveFx.addEventListener('animationend', () => { diveFx.className = 'dive-fx'; });   // fuera de la animación no ocupa capa
+let diveOn = false;
+// el agua entra por los bordes de la pantalla un momento y se retira
+function diveOverlay() {
+  if (!diveFx) return;
+  if (!diveOn || diveT >= 1.6) { if (diveFx.classList.contains('on')) { diveFx.classList.remove('on'); diveFx.style.removeProperty('--dv'); } return; }
+  const v = diveT < .3 ? smooth(0, .3, diveT) : 1 - smooth(.3, 1.6, diveT);
+  diveFx.classList.add('on'); diveFx.style.setProperty('--dv', v.toFixed(3));
+}
 const diveWave = t => t < .45 ? smooth(0, .45, t) : Math.exp(-(t - .45) * 1.5);   // sube suave y se apaga lento
 
 /* ---------- LOOP ---------- */
@@ -1039,8 +1046,8 @@ function frame(now) {
     composeSky(t); if (gl) upload(0, texSky, skyC, false);
   }
   const sub = top > SEA.surf - 30;                                           // la línea del agua ya pasó el borde superior
-  if (SEA.sub !== undefined && sub !== SEA.sub && !SEA.reduced) { diveT = 0; if (!paused) diveSweep(sub); }
-  SEA.sub = sub; diveT += dt; SEA.waveBoost = diveWave(diveT);
+  if (SEA.sub !== undefined && sub !== SEA.sub && !SEA.reduced) { diveT = 0; diveOn = !paused; }
+  SEA.sub = sub; diveT += dt; SEA.waveBoost = diveWave(diveT); diveOverlay();
   if (diveT < 1.2 && BG.bubbles.length < 260 && Math.random() < dt * (SEA.lite ? 14 : 28))
     BG.bubbles.push({ x: rnd(0, SEA.vw), y: top + SEA.vh * rnd(.8, 1.1), r: rnd(0, 2) | 0, v: rnd(110, 220), ph: rnd(0, 6) });
   updateWater(BG, dt, t); updateMotes(dt, t);

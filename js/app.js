@@ -51,7 +51,7 @@ const EN = {
   'contact.sub': 'Available for backend, mobile and full-stack roles — remote or in Lima.', 'contact.copy': 'copy',
   'form.title': 'Message in a bottle', 'form.name': 'Name', 'form.msg': 'Message', 'form.ph': 'What are you working on?', 'form.send': 'Throw the bottle →',
   'form.note': 'Your email app will open with the message ready to send.',
-  foot: 'Handmade with HTML, Canvas and WebGL.',
+  foot: 'Handmade with HTML, Canvas and WebGL.', accent: 'Main color',
 };
 const TXT = {
   es: { day: 'día', night: 'noche', dawn: 'amanecer', dusk: 'atardecer', copied: '¡Email copiado!', sent: 'Botella lanzada: revisa tu correo', modes: ['Ciclo real: sigue tu hora local', 'Siempre de día', 'Siempre de noche'], motion: ['Pausar animación', 'Reanudar animación'] },
@@ -231,7 +231,20 @@ $('#bottle').addEventListener('submit', e => {
   location.href = `mailto:${EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 });
 
+/* ---------- COLOR PRINCIPAL ---------- */
+const ACCENTS = ['agua', 'coral', 'lavanda', 'celeste', 'lima', 'ambar'];
+function setAccent(a) {
+  document.documentElement.dataset.accent = a; store.set('accent', a);
+  for (const b of $$('[data-accent-set]')) b.setAttribute('aria-pressed', String(b.dataset.accentSet === a));
+  if (SEA.ready) buildName();                                               // el apellido bajo el agua toma el color nuevo
+}
+const accentBox = $('#accent');
+$('#accent-btn').addEventListener('click', () => { const o = accentBox.classList.toggle('open'); $('#accent-btn').setAttribute('aria-expanded', String(o)); });
+for (const b of $$('[data-accent-set]')) b.addEventListener('click', () => { setAccent(b.dataset.accentSet); accentBox.classList.remove('open'); $('#accent-btn').setAttribute('aria-expanded', 'false'); });
+addEventListener('click', e => { if (!accentBox.contains(e.target)) { accentBox.classList.remove('open'); $('#accent-btn').setAttribute('aria-expanded', 'false'); } });
+
 /* ---------- ARRANQUE ---------- */
+setAccent(ACCENTS.includes(store.get('accent')) ? store.get('accent') : 'agua');
 $('#year').textContent = new Date().getFullYear();
 SEA.theme = MODES.includes(store.get('theme')) ? store.get('theme') : 'auto';
 SEA.paused = store.get('motion') ? store.get('motion') === 'off' : SEA.reduced;

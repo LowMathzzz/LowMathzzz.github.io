@@ -27,7 +27,7 @@
 <div class="frame" aria-hidden="true"></div>
 <div class="dive-fx" id="dive-fx" aria-hidden="true"></div>
 <svg class="defs" aria-hidden="true" focusable="false">
-  <symbol id="i-fish" viewBox="0 0 16 10"><path fill="#ffd25a" d="M3 3h1v1h1V3h1V2h5v1h2v1h1v2h-1v1h-2v1H6V7H5V6H4v1H3V6H2V4h1z"/><path fill="#0b2624" d="M11 4h1v1h-1z"/><path fill="#ff8a2a" d="M0 2h2v2H1v2h1v2H0z"/></symbol>
+  <symbol id="i-fish" viewBox="0 0 16 10"><path style="fill:var(--gold)" d="M3 3h1v1h1V3h1V2h5v1h2v1h1v2h-1v1h-2v1H6V7H5V6H4v1H3V6H2V4h1z"/><path fill="#0b2624" d="M11 4h1v1h-1z"/><path fill="#ff8a2a" d="M0 2h2v2H1v2h1v2H0z"/></symbol>
   <symbol id="i-in" viewBox="0 0 24 24"><path fill="currentColor" d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/></symbol>
   <symbol id="i-gh" viewBox="0 0 16 16"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38v-1.49c-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48v2.2c0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></symbol>
   <symbol id="i-mail" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" d="M3 5h18v14H3z M3 6l9 7 9-7"/></symbol>
@@ -52,6 +52,17 @@
     <div class="seg" role="group" aria-label="Idioma / Language">
       <button type="button" data-lang="es" aria-pressed="true">ES</button>
       <button type="button" data-lang="en" aria-pressed="false">EN</button>
+    </div>
+    <div class="accent" id="accent">
+      <button type="button" class="icon-btn accent-btn" id="accent-btn" aria-expanded="false" aria-controls="accent-menu" aria-label="Color principal" data-i18n-attr="aria-label:accent"><i aria-hidden="true"></i></button>
+      <div class="accent-menu" id="accent-menu" role="group" aria-label="Color principal" data-i18n-attr="aria-label:accent">
+        <button type="button" data-accent-set="agua" style="--c:#6fe3cf" aria-label="Agua" title="Agua"></button>
+        <button type="button" data-accent-set="coral" style="--c:#ff8f73" aria-label="Coral" title="Coral"></button>
+        <button type="button" data-accent-set="lavanda" style="--c:#b9a4ff" aria-label="Lavanda" title="Lavanda"></button>
+        <button type="button" data-accent-set="celeste" style="--c:#7cc8ff" aria-label="Celeste" title="Celeste"></button>
+        <button type="button" data-accent-set="lima" style="--c:#b5e86f" aria-label="Lima" title="Lima"></button>
+        <button type="button" data-accent-set="ambar" style="--c:#ffd25a" aria-label="Ámbar" title="Ámbar"></button>
+      </div>
     </div>
     <button type="button" class="icon-btn" id="theme-btn" aria-label="Ciclo día/noche"><span aria-hidden="true">◐</span></button>
     <button type="button" class="icon-btn menu-btn" id="menu-btn" aria-expanded="false" aria-controls="nav-links" aria-label="Menú" data-i18n-attr="aria-label:nav.menu"><span aria-hidden="true">≡</span></button>
@@ -326,7 +337,6 @@
             <li class="wip"><svg aria-hidden="true"><use href="#i-book"/></svg><span data-i18n="cert.cyber">Analista de Ciberseguridad</span><em data-i18n="cert.wip">en curso</em></li>
           </ul>
         </div>
-        <div class="cv-foot"><a class="btn btn-ghost btn-sm" href="https://cv.lowmath.dev"><svg class="ico" aria-hidden="true"><use href="#i-cv"/></svg><span data-i18n="bg.cv">Ver CV completo</span></a></div>
       </div>
     </div>
   </section>
@@ -347,6 +357,7 @@
             <li><button type="button" class="link-row" data-copy="mateoloechle@outlook.com"><span class="li-ico" aria-hidden="true">@</span><span class="li-main">mateoloechle@outlook.com</span><span class="li-act" data-i18n="contact.copy">copiar</span></button></li>
             <li><a class="link-row" href="https://www.linkedin.com/in/mateo-italo-loechle-arias-186173329/" target="_blank" rel="noopener"><span class="li-ico" aria-hidden="true">in</span><span class="li-main">LinkedIn</span><span class="li-act">↗</span></a></li>
             <li><a class="link-row" href="https://github.com/LowMathzzz" target="_blank" rel="noopener"><span class="li-ico" aria-hidden="true">gh</span><span class="li-main">github.com/LowMathzzz</span><span class="li-act">↗</span></a></li>
+            <li><a class="link-row" href="https://cv.lowmath.dev"><span class="li-ico" aria-hidden="true">cv</span><span class="li-main" data-i18n="bg.cv">Ver CV completo</span><span class="li-act">→</span></a></li>
           </ul>
           <p class="contact-meta"><span data-i18n="hero.time">Hora en Lima</span> <b class="lima-time">--:--</b></p>
         </div>
