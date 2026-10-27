@@ -2,7 +2,7 @@
 /* ===== Pecera del portfolio: el agua sigue al scroll. Canvas 2D dibuja a resolución pixel y WebGL compone agua, luz y vidrio ===== */
 const SEA = {
   px: 3, vw: 1, vh: 1, doc: 1, scroll: 0, oy: 0, surf: 280, floor0: 0, bedTop: 0, k: 1,
-  night: 0, light: null, theme: 'auto', lang: 'es', style: '2d', bands: {}, skyDirty: true,
+  night: 0, light: null, theme: 'auto', lang: 'es', bands: {}, skyDirty: true, paused: false, waveBoost: 0,
   reduced: matchMedia('(prefers-reduced-motion: reduce)').matches, onTick: null, onLayout: null,
   lite: document.documentElement.classList.contains('lite'),                 // móvil / equipo modesto: lo decide el <head>
 };
@@ -11,11 +11,13 @@ function goLite() { SEA.lite = true; SEA.fps = 30; document.documentElement.clas
 
 /* ---------- TRABAJO DIFERIDO: los sprites se generan de a uno en ratos libres, sin congelar el arranque ---------- */
 const JOBS = [], idle = window.requestIdleCallback ? f => requestIdleCallback(f, { timeout: 300 }) : f => setTimeout(f, 16);
-function later(job) { JOBS.push(job); if (JOBS.length === 1) idle(pump); }
+let pumpQueued = false;
+function later(job) { JOBS.push(job); if (!pumpQueued) { pumpQueued = true; idle(pump); } }
 function pump(dl) {
+  pumpQueued = false;
   const end = performance.now() + (dl && dl.timeRemaining ? Math.max(4, dl.timeRemaining()) : 8);
-  do JOBS.shift()(); while (JOBS.length && performance.now() < end);
-  if (JOBS.length) idle(pump);
+  while (JOBS.length) { JOBS.shift()(); if (performance.now() > end) break; }   // un trabajo puede encolar otro: se respeta el presupuesto
+  if (JOBS.length && !pumpQueued) { pumpQueued = true; idle(pump); }
 }
 const M = { x: -1e4, y: -1e4, cx: -1e4, cy: -1e4, moveT: -99, t: 0 };   // mouse: mundo (px del documento) y cliente
 const WATER = [0.13, 0.42, 0.36], DEEP = [0.035, 0.12, 0.17], LED = [0.25, 0.40, 0.95];
@@ -172,7 +174,7 @@ function renderGL(t) {
   const L = SEA.light, px = SEA.px;
   gl.uniform2f(U.uRes, AW, AH); gl.uniform2f(U.uSkyRes, skyC.width, skyC.height); gl.uniform2f(U.uDir, L.dir[0], L.dir[1]);
   gl.uniform1f(U.uPX, px); gl.uniform1f(U.uScroll, SEA.oy * px); gl.uniform1f(U.uSurf, SEA.surf); gl.uniform1f(U.uFloor, SEA.floor0);
-  gl.uniform1f(U.uT, t); gl.uniform1f(U.uNight, L.night); gl.uniform1f(U.uWave, SEA.reduced ? 0 : .9); gl.uniform1f(U.uR, SEA.vw < 700 ? 9 : 14);
+  gl.uniform1f(U.uT, t); gl.uniform1f(U.uNight, L.night); gl.uniform1f(U.uWave, SEA.reduced ? 0 : .9 + 1.5 * SEA.waveBoost); gl.uniform1f(U.uR, SEA.vw < 700 ? 9 : 14);
   gl.uniform3fv(U.uAmb, L.amb); gl.uniform3fv(U.uSun, L.sun); gl.uniform3fv(U.uLed, LED); gl.uniform3fv(U.uWater, WATER); gl.uniform3fv(U.uDeep, DEEP);
   gl.drawArrays(gl.TRIANGLES, 0, 3);
 }
@@ -189,26 +191,35 @@ function render2D() {
   c.drawImage(fgC, 0, 0);
 }
 
-/* ---------- CIELO SOBRE EL AGUA (pixel art, se redibuja cada 2 s) ---------- */
+/* ---------- CIELO SOBRE EL AGUA: fondo y montañas fijos; las nubes se desplazan suave en cada frame ---------- */
+const skyBg = mkCanvas(), skyFg = mkCanvas();
 function disc(c, x, y, r, color) {
   c.fillStyle = color; x = Math.round(x); y = Math.round(y);
   for (let dy = -r; dy <= r; dy++) { const w = Math.round(Math.sqrt(r * r - dy * dy)); c.fillRect(x - w, y + dy, w * 2 + 1, 1); }
 }
-function drawSky(h, t) {
-  const px = SEA.px, W = AW, hor = Math.round(SEA.surf / px), H = hor + 12;
-  if (skyC.width !== W || skyC.height !== H) { skyC.width = W; skyC.height = H; }
-  const c = skyC.getContext('2d'), L = SEA.light, R = seeded(5), [zen, hz] = skyAt(h), night = L.night;
-  const warm = 1 - smooth(.05, .6, L.elev), sunCol = mix3([1, .97, .88], [1, .6, .3], warm);
+// ruido periódico en x: la tira de nubes se repite sin costura y solo se mueve, no se redibuja
+function vnoiseP(x, y, per) {
+  const xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi, u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf);
+  const x0 = ((xi % per) + per) % per, x1 = (x0 + 1) % per;
+  return lerp(lerp(hsh(x0, yi, 77), hsh(x1, yi, 77), u), lerp(hsh(x0, yi + 1, 77), hsh(x1, yi + 1, 77), u), v);
+}
+function fbmP(x, y, per) { let s = 0, a = .5; for (let o = 0; o < 5; o++) { s += a * vnoiseP(x, y, per); x = x * 2 + 17; y = y * 2.03 + 9.7; per *= 2; a *= .5; } return s / .97; }
+const skySize = () => { const hor = Math.round(SEA.surf / SEA.px); return { W: AW, hor, H: hor + 12 }; };
+const sunOrb = (hh, W, hor) => { const e = Math.sin(Math.PI * (hh - 6) / 12); return [W * (.12 + .76 * (hh - 6) / 12), hor - (hor - 30) * .85 * Math.max(e, 0) + 4, e]; };
+const sunTint = L => { const warm = 1 - smooth(.05, .6, L.elev); return [warm, mix3([1, .97, .88], [1, .6, .3], warm)]; };
+function drawSkyLayers(h) {
+  const px = SEA.px, { W, hor, H } = skySize(), L = SEA.light, [zen, hz] = skyAt(h), night = L.night, [warm, sunCol] = sunTint(L);
+  for (const cv of [skyBg, skyFg, skyC]) if (cv.width !== W || cv.height !== H) { cv.width = W; cv.height = H; }
+  let c = skyBg.getContext('2d'), R = seeded(5);                               // fondo: degradado, estrellas, sol y luna
   c.imageSmoothingEnabled = false; c.globalAlpha = 1;
-  let g = c.createLinearGradient(0, 0, 0, hor);
+  const g = c.createLinearGradient(0, 0, 0, hor);
   g.addColorStop(0, css(zen)); g.addColorStop(.6, css(mix3(zen, hz, .5))); g.addColorStop(1, css(hz));
   c.fillStyle = g; c.fillRect(0, 0, W, H);
   if (night > .2) for (let i = 0; i < W * .3; i++) { c.globalAlpha = (night - .2) * (.25 + R() * .75); c.fillStyle = '#fff'; c.fillRect(R() * W | 0, R() * hor * .8 | 0, 1, 1); }
   c.globalAlpha = 1;
-  const orb = hh => { const e = Math.sin(Math.PI * (hh - 6) / 12); return [W * (.12 + .76 * (hh - 6) / 12), hor - (hor - 30) * .85 * Math.max(e, 0) + 4, e]; };
-  const [sx, sy, se] = orb(h);
+  const [sx, sy, se] = sunOrb(h, W, hor);
   if (se > -.15) {
-    let gg = c.createRadialGradient(sx, hor, 2, sx, hor, W * .5);                            // resplandor del horizonte
+    let gg = c.createRadialGradient(sx, hor, 2, sx, hor, W * .5);                       // resplandor del horizonte
     gg.addColorStop(0, css(sunCol, .5 * (.3 + warm * .7) * smooth(-.15, .05, se))); gg.addColorStop(1, css(sunCol, 0));
     c.fillStyle = gg; c.fillRect(0, 0, W, H);
     gg = c.createRadialGradient(sx, sy, 0, sx, sy, 70);
@@ -216,37 +227,14 @@ function drawSky(h, t) {
     c.fillStyle = gg; c.fillRect(sx - 70, sy - 70, 140, 140);
     disc(c, sx, sy, 7, css(mix3([1, 1, .96], sunCol, .4)));
   }
-  const [mx, my, me] = orb((h + 12) % 24);
+  const [mx, my, me] = sunOrb((h + 12) % 24, W, hor);
   if (me > 0 && night > .3) {
     const gg = c.createRadialGradient(mx, my, 2, mx, my, 40); gg.addColorStop(0, css([.75, .8, 1], .3 * night)); gg.addColorStop(1, css([.75, .8, 1], 0));
     c.fillStyle = gg; c.fillRect(mx - 40, my - 40, 80, 80);
     disc(c, mx, my, 6, '#e8ecf4');
     c.fillStyle = 'rgba(120,130,150,.45)'; for (const [ox, oy] of [[-2, -2], [2, 1], [-1, 3], [3, -3]]) c.fillRect(Math.round(mx) + ox, Math.round(my) + oy, 2, 1);
   }
-  // nubes por ruido fractal: luz del lado del sol y base en sombra
-  const litC = mix3(mix3([1, 1, 1], sunCol, warm * .75), [.2, .22, .32], night * .85).map(v => v * (1 - night * .45));
-  const shadeC = mix3(mix3(hz, zen, .45).map(v => v * .78), [.07, .08, .13], night * .7);
-  const DS = 2, cw = Math.ceil(W / DS), ch = Math.ceil(hor * .85 / DS);
-  cloudC.width = cw; cloudC.height = ch;
-  const cc = cloudC.getContext('2d'), id = cc.createImageData(cw, ch), dd = id.data, cov = .52, drift = t * 4;
-  for (let j = 0; j < ch; j++) {
-    const wy = j * DS * px, vy = j / ch, band = smooth(0, .18, vy) * (1 - smooth(.72, 1, vy));
-    for (let i = 0; i < cw; i++) {
-      const wx = i * DS * px, nx = (wx + drift) * .0032, ny = wy * .0085;
-      const d = fbm(nx, ny) * (.75 + .35 * band) - (1 - band) * .15, a = smooth(cov, cov + .16, d);
-      if (a <= 0) continue;
-      const dxs = sx * px - wx, dys = sy * px - wy, dl = Math.hypot(dxs, dys) || 1;
-      const d2 = fbm(nx + dxs / dl * .05, ny + dys / dl * .13);
-      const litAmt = clamp(.55 + (d - d2) * 5, 0, 1), thick = smooth(cov, cov + .45, d);
-      let ccol = mix3(shadeC, litC, litAmt * (1 - .45 * thick));
-      const rim = Math.max(0, 1 - dl / 380) * (1 - a) * 1.2 * (1 - night);
-      ccol = ccol.map((q, k) => q + sunCol[k] * rim);
-      const o = (j * cw + i) * 4;
-      dd[o] = ccol[0] * 255; dd[o + 1] = ccol[1] * 255; dd[o + 2] = ccol[2] * 255; dd[o + 3] = a > .5 ? 245 : 0;
-    }
-  }
-  cc.putImageData(id, 0, 0); c.drawImage(cloudC, 0, 0, cw * DS, ch * DS);
-  // montañas con perspectiva atmosférica y pinos en la orilla (columnas de 1 px: bordes nítidos)
+  c = skyFg.getContext('2d'); R = seeded(9); c.clearRect(0, 0, W, H);       // frente: montañas con perspectiva atmosférica y pinos
   const rock = [.24, .27, .3].map(v => v * (1 - night * .7));
   [[hor - 9, 34, .72, .003, 1.3], [hor - 3, 22, .45, .006, 4.1], [hor + 1, 12, .2, .011, 7.7]].forEach(([by, amp, haze, f, s]) => {
     c.fillStyle = css(mix3(rock, hz.map(v => v * (1 - night * .5)), haze));
@@ -261,6 +249,77 @@ function drawSky(h, t) {
     }
   }
   if (night > .4) { c.fillStyle = '#ffd27a'; for (let i = 0; i < 8; i++) c.fillRect(R() * W | 0, hor - 3 - (R() * 12 | 0), 1, 1); }
+}
+// nubes por ruido fractal, generadas por filas en ratos libres (nunca una tarea larga)
+let cloudJob = 0;
+function drawClouds(h) {
+  const job = ++cloudJob, px = SEA.px, { W, hor } = skySize(), L = SEA.light, [zen, hz] = skyAt(h), night = L.night, [warm, sunCol] = sunTint(L);
+  const litC = mix3(mix3([1, 1, 1], sunCol, warm * .75), [.2, .22, .32], night * .85).map(v => v * (1 - night * .45));
+  const shadeC = mix3(mix3(hz, zen, .45).map(v => v * .78), [.07, .08, .13], night * .7);
+  const [sx, sy] = sunOrb(h, W, hor), lx = sx - W / 2, ly = sy - hor * .4, ll = Math.hypot(lx, ly) || 1;   // luz desde el lado del sol
+  const cw = W, ch = Math.ceil(hor * .85), per = Math.max(2, Math.round(cw * px * .0032)), fx = per / cw;
+  const field = (i, j) => { const vy = j / ch, band = smooth(0, .18, vy) * (1 - smooth(.72, 1, vy)); return fbmP(i * fx, j * px * .0085, per) * (.75 + .35 * band) - (1 - band) * .15; };
+  const sample = []; for (let j = 0; j < ch; j += 6) for (let i = 0; i < cw; i += 6) sample.push(field(i, j));
+  sample.sort((a, b) => b - a);
+  const thr = sample[Math.floor(sample.length * .24)] || .6;                 // umbral por percentil: ~24 % de nubes en cualquier pantalla
+  const id = new ImageData(cw, ch), dd = id.data; let j = 0;
+  const rows = () => {
+    if (job !== cloudJob) return;                                          // otra generación la reemplazó
+    for (const end = Math.min(ch, j + 10); j < end; j++) {
+      const ny = j * px * .0085;
+      for (let i = 0; i < cw; i++) {
+        const nx = i * fx, d = field(i, j);
+        if (d < thr) continue;
+        const d2 = fbmP(nx + lx / ll * .05, ny + ly / ll * .13, per);
+        const litAmt = clamp(.55 + (d - d2) * 5, 0, 1), thick = smooth(thr - .08, thr + .37, d), cc = mix3(shadeC, litC, litAmt * (1 - .45 * thick)), o = (j * cw + i) * 4;
+        dd[o] = cc[0] * 255; dd[o + 1] = cc[1] * 255; dd[o + 2] = cc[2] * 255; dd[o + 3] = 245;
+      }
+    }
+    if (j < ch) later(rows);
+    else { cloudC.width = cw; cloudC.height = ch; cloudC.getContext('2d').putImageData(id, 0, 0); }
+  };
+  later(rows);
+}
+function composeSky(t) {
+  const c = skyC.getContext('2d'), cw = cloudC.width, off = ((t * 2) % cw + cw) % cw;   // 2 px de arte por segundo
+  c.imageSmoothingEnabled = false; c.drawImage(skyBg, 0, 0);
+  c.imageSmoothingEnabled = true; c.drawImage(cloudC, -off, 0); c.drawImage(cloudC, cw - off, 0);
+  c.imageSmoothingEnabled = false; c.drawImage(skyFg, 0, 0);
+}
+
+/* ---------- NOMBRE BAJO EL AGUA: la mitad sumergida se dibuja en canvas con ondas de refracción ---------- */
+const NAME = { c: mkCanvas(), ok: false, split: 0, bot: 0, night: null };
+function buildName() {
+  const h1 = document.getElementById('name'), el = h1 && h1.querySelector('.name-a'); NAME.ok = false;
+  if (!el) return;
+  const cs = getComputedStyle(el), fs = parseFloat(cs.fontSize), r = h1.getBoundingClientRect(), o = fs * .03, night = SEA.night > .55;
+  NAME.split = Math.round(r.top + scrollY + r.height * .52); NAME.bot = Math.ceil(r.bottom + scrollY + fs * .12);
+  const c = NAME.c, x = c.getContext('2d'), H = NAME.bot - NAME.split;
+  c.width = Math.ceil(SEA.vw * DPR); c.height = Math.ceil(H * DPR);
+  x.setTransform(DPR, 0, 0, DPR, 0, -NAME.split * DPR);                     // coordenadas del documento
+  x.font = cs.fontWeight + ' ' + fs + 'px ' + cs.fontFamily; x.textBaseline = 'alphabetic';
+  if ('letterSpacing' in x) x.letterSpacing = cs.letterSpacing;
+  const asc = x.measureText('M').fontBoundingBoxAscent || fs * .8;
+  for (const w of el.children) {
+    const b = w.getBoundingClientRect(), tx = w.textContent.toUpperCase(), X = b.left, Y = b.top + scrollY + asc;
+    x.fillStyle = '#072320';                                                 // el mismo contorno que la mitad de arriba
+    for (const [dx, dy] of [[o, 0], [-o, 0], [0, o], [0, -o], [o, o], [-o, o], [o, -o], [-o, -o]]) x.fillText(tx, X + dx, Y + dy);
+    x.fillStyle = night ? '#cfdcf4' : '#d6f5ee'; x.fillText(tx, X, Y);
+  }
+  x.globalCompositeOperation = 'source-atop';                                // más hondo, más teñido por el agua
+  const g = x.createLinearGradient(0, NAME.split, 0, NAME.bot);
+  g.addColorStop(0, 'rgba(160,230,215,0)'); g.addColorStop(1, night ? 'rgba(40,70,140,.55)' : 'rgba(25,115,105,.5)');
+  x.fillStyle = g; x.fillRect(0, NAME.split, SEA.vw, H); x.globalCompositeOperation = 'source-over';
+  NAME.night = night; NAME.ok = true;
+}
+function drawName(c, t, top) {
+  const H = NAME.c.height, W = NAME.c.width, step = Math.max(2, Math.round(2 * DPR)), y0 = Math.round((NAME.split - top) * DPR);
+  c.setTransform(1, 0, 0, 1, 0, 0); c.globalAlpha = .92;
+  for (let sy = 0; sy < H; sy += step) {                                     // franjas horizontales desplazadas por dos ondas que viajan
+    const y = sy / DPR, amp = (.8 + 4.2 * sy / H) * DPR;
+    c.drawImage(NAME.c, 0, sy, W, step, amp * Math.sin(y * .11 - t * 2.6) + amp * .5 * Math.sin(y * .29 + t * 1.9), y0 + sy, W, step);
+  }
+  c.globalAlpha = 1;
 }
 
 /* ---------- FONDO DE LA PECERA: grava, tronco, roca, maceta, coco y corales (de la pecera original) ---------- */
@@ -349,7 +408,7 @@ function buildBed() {
   drawCorals(A, R);
   for (let i = 0; i < 900 * W / 1800; i++) { const x = R() * W, y = floorY(x) + (34 + R() * 64) * k; F.fillStyle = R() < .15 ? MOSS[R() * 3 | 0] : PEB[R() * 6 | 0]; F.fillRect(snap(x), snap(y), P * (1 + (R() < .3)), P); }
   crisp(decA); crisp(decF);
-  buildPlants(); buildGround();
+  buildPlants(); buildGround(); plantsOk = false;
   clam.x = fr(.905);
 }
 
@@ -515,8 +574,7 @@ class Fish {
     }
   }
   draw(c) {
-    const v3 = SEA.style === '3d' && (this.spr.v3 || SEA.budget3d-- > 0);   // el voxel se genera de a poco, sin trabar el frame
-    const st = v3 ? sprites3D(this.spr) : this.spr, px = this.px;
+    const st = this.spr, px = this.px;
     const a = Math.abs(this.face), sg = this.face < 0 ? -1 : 1;
     const img = a > .85 ? st.frames[(this.anim | 0) % NF] : st.turn[a > .6 ? 0 : a > .3 ? 1 : 2];
     c.save(); c.globalAlpha = this.alpha;
@@ -706,9 +764,9 @@ const BG = {
   lim: { x0: 30, x1: 1000 }, view: { top: 0, h: 800 }, surfAt: x => surfY(x, tNow), floorAt: x => floorY(x),
 };
 // [especie, cantidad, sección donde vive] — en orden de aparición: primero lo que se ve al cargar
-const BG_FISH = [['betta', 1, 'follow'], ['neon', 10, 'top'], ['cebra', 6, 'top'], ['arcoiris', 3, 'top'], ['guppy', 5, 'about'], ['platy', 3, 'about'],
-  ['killi', 1, 'stack'], ['gourami', 1, 'experience'], ['arcoiris', 3, 'experience'], ['neon', 9, 'projects'], ['platy', 3, 'pearls'],
-  ['guppy', 3, 'pearls'], ['goldfish', 1, 'contact'], ['cory', 5, 'floor'], ['pleco', 1, 'floor']];
+const BG_FISH = [['betta', 1, 'follow'], ['neon', 10, 'top'], ['cebra', 6, 'top'], ['arcoiris', 3, 'top'], ['guppy', 5, 'profile'], ['platy', 3, 'profile'],
+  ['neon', 9, 'work'], ['gourami', 1, 'work'], ['killi', 1, 'tech'], ['arcoiris', 3, 'background'], ['platy', 3, 'background'],
+  ['guppy', 3, 'contact'], ['goldfish', 1, 'contact'], ['cory', 5, 'floor'], ['pleco', 1, 'floor']];
 let shrimps = [], snails = [], motes = [];
 const bandOf = key => () => {
   const b = key === 'follow' ? { y0: BG.view.top + 90, y1: BG.view.top + BG.view.h - 90 } : SEA.bands[key] || SEA.bands.top;
@@ -716,14 +774,15 @@ const bandOf = key => () => {
 };
 function measureBands() {
   const B = SEA.bands, box = id => { const el = document.getElementById(id); if (!el) return null; const r = el.getBoundingClientRect(); return [r.top + scrollY, r.bottom + scrollY]; };
-  for (const id of ['about', 'stack', 'experience', 'projects', 'pearls', 'contact']) { const r = box(id); if (r) B[id] = { y0: r[0] + 40, y1: r[1] - 40 }; }
+  for (const id of ['profile', 'work', 'tech', 'background', 'contact']) { const r = box(id); if (r) B[id] = { y0: r[0] + 40, y1: r[1] - 40 }; }
   const hero = box('top'); B.top = { y0: SEA.surf + 60, y1: hero ? hero[1] : SEA.vh };
   B.floor = { y0: SEA.floor0 - 60, y1: SEA.floor0 };
 }
-// agrega un pez cuando su sprite está listo; aparece con un fundido
+// agrega un pez cuando su sprite está listo; aparece con un fundido (en pausa, directo)
 function addFish(g, sp, spr, o) {
-  const f = new Fish(g, sp, spr, o); f.alpha = 0;
+  const f = new Fish(g, sp, spr, o); f.alpha = SEA.paused ? 1 : 0;
   g.members.push(f); if (g.members.length === 1) g.pick();
+  g.w.drawn = false;
   return f;
 }
 function populate() {
@@ -756,7 +815,7 @@ function layout() {
   SEA.px = BG.px = px; SEA.vw = vw; SEA.vh = vh; SEA.doc = de.scrollHeight;
   SEA.k = clamp(vw / 1700, .5, 1.1);
   const name = document.getElementById('name');
-  if (name) { const r = name.getBoundingClientRect(); SEA.surf = Math.round(r.top + scrollY + r.height * .5); }   // la línea del agua cruza el nombre
+  if (name) { const r = name.getBoundingClientRect(); SEA.surf = Math.round(r.top + scrollY + r.height * .52); }   // la línea del agua cruza el nombre (mismo corte que el CSS)
   SEA.bedTop = Math.floor((SEA.doc - BED_H * SEA.k) / px) * px;
   SEA.floor0 = SEA.bedTop + (BED_H - 110) * SEA.k;
   AW = Math.ceil(vw / px); AH = Math.ceil(vh / px);
@@ -768,7 +827,7 @@ function layout() {
   DPR = Math.min(2, devicePixelRatio || 1);
   uiC.width = Math.round(vw * DPR); uiC.height = Math.round(vh * DPR);
   BG.lim = { x0: 30, x1: vw - 30 };
-  measureBands();
+  measureBands(); buildName();
   if (rebuild) buildBed();
   SEA.skyDirty = true;
   if (!SEA.ready) { SEA.ready = true; populate(); }
@@ -781,7 +840,7 @@ new ResizeObserver(relayout).observe(document.body);
 if (document.fonts) document.fonts.ready.then(layout);
 
 /* ---------- MOUSE Y TECLADO ---------- */
-const NOFEED = 'a,button,input,textarea,select,label,summary,.panel,.tank,.nav,.gauge,.ticker,[data-nofeed]';
+const NOFEED = 'a,button,input,textarea,select,label,summary,.sheet,.tabs,.tank,.nav,.gauge,[data-nofeed]';
 addEventListener('pointermove', e => {
   if (e.pointerType === 'touch') return;
   const x = e.clientX, y = e.clientY + scrollY, dt = Math.max(1e-3, tNow - M.t), speed = Math.hypot(x - M.x, y - M.y) / dt;
@@ -812,11 +871,11 @@ addEventListener('keydown', e => {
 });
 
 /* ---------- DIBUJO ---------- */
-let plantT = -1;
+let plantT = -1, plantsOk = false;
 function drawFg(t) {
   const c = fx, px = SEA.px, top = SEA.oy * px, bot = top + SEA.vh, bedVis = SEA.bedTop < bot + 60;
-  if (bedVis && t - plantT > (SEA.lite ? 1 / 12 : 1 / 30)) {                 // las plantas se mecen lento: no hace falta redibujarlas cada frame
-    plantT = t;
+  if (bedVis && (t - plantT > (SEA.lite ? 1 / 12 : 1 / 30) || !plantsOk)) {  // las plantas se mecen lento: no hace falta redibujarlas cada frame
+    plantT = t; plantsOk = true;
     for (const [cv, layer] of [[plB, 0], [plF, 1]]) {
       const pc = bedCtx(cv); pc.lineCap = 'butt';
       for (const p of plants) if (p.layer === layer) drawPlant(pc, p, t);
@@ -857,20 +916,14 @@ function tag(c, text, x, y, color = '#fff', a = 1, w = 0) {
 }
 let uiDrawn = true;
 function drawUI(t) {
-  const c = ux, top = SEA.oy * SEA.px, emo = [];
-  let hov = null, hd = 130;
-  for (const f of BG.fish) {
-    if (f.y < top - 60 || f.y > top + SEA.vh + 60) continue;
-    if (f.emoteT > 0) emo.push(f);
-    const d = Math.hypot(f.x - M.x, f.y - M.y); if (d < hd) { hd = d; hov = f; }
-  }
-  if (t - M.moveT > 4) hov = null;
-  if (!emo.length && !hov && !uiDrawn) return;                              // nada que dibujar: ni siquiera se limpia
+  const c = ux, top = SEA.oy * SEA.px, emo = BG.fish.filter(f => f.emoteT > 0 && f.y > top - 60 && f.y < top + SEA.vh + 60);
+  const nameVis = NAME.ok && NAME.bot > top && NAME.split < top + SEA.vh;
+  if (!emo.length && !nameVis && !uiDrawn) return;                          // nada que dibujar: ni siquiera se limpia
   c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, uiC.width, uiC.height);
-  uiDrawn = emo.length > 0 || !!hov; if (!uiDrawn) return;
+  uiDrawn = emo.length > 0 || nameVis; if (!uiDrawn) return;
+  if (nameVis) drawName(c, t, top);
   c.setTransform(DPR, 0, 0, DPR, 0, -top * DPR); c.textAlign = 'center';
   for (const f of emo) emote(c, f);
-  if (hov) tag(c, SEA.lang === 'en' ? hov.sp.en : hov.sp.name, hov.x, hov.y - hov.ph * .42 - 8);
 }
 
 /* ---------- PECERAS CHICAS (stack y demo de proyecto) ---------- */
@@ -885,6 +938,7 @@ class Tank {
     this.gravel = mkCanvas();
     new ResizeObserver(() => this.resize()).observe(el);
     new IntersectionObserver(([e]) => { this.visible = e.isIntersecting; }, { rootMargin: '80px' }).observe(el);
+    new IntersectionObserver(([e], ob) => { if (e.isIntersecting) { ob.disconnect(); this.fill(this); } }, { rootMargin: '900px 0px' }).observe(el);   // sus peces se generan recién cuando la sección se acerca
     const local = e => { const r = this.cv.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
     el.addEventListener('pointermove', e => {
       if (e.pointerType === 'touch') return;
@@ -904,7 +958,7 @@ class Tank {
   }
   resize() {
     const r = this.cv.getBoundingClientRect(); if (!r.width || !r.height) return;
-    this.w = r.width; this.h = r.height;
+    this.w = r.width; this.h = r.height; this.drawn = false;
     this.cv.width = Math.ceil(this.w / this.px); this.cv.height = Math.ceil(this.h / this.px);
     if (this.u) { this.uc.width = Math.round(this.w * DPR); this.uc.height = Math.round(this.h * DPR); }
     this.lim = { x0: 22, x1: this.w - 22 };
@@ -912,7 +966,6 @@ class Tank {
     g.width = this.cv.width; g.height = 14;
     for (let x = 0; x < g.width; x++) { const top = Math.round(6 + Math.sin(x * this.px * .045) * 1); for (let y = top; y < 14; y++) { gc.fillStyle = PEB[R() * 6 | 0]; gc.fillRect(x, y, 1, 1); } }
     this.weeds = []; for (let x = 18; x < this.w - 10; x += 26 + R() * 70) this.weeds.push({ x, h: (.35 + R() * .45) * this.h, c: ['#3d8a33', '#58a83e', '#6fbf4c'][R() * 3 | 0], ph: R() * 6 });
-    if (!this.groups.length) this.fill(this);
   }
   fishAt(x, y) { return this.groups.flatMap(g => g.members).find(f => Math.hypot(f.x - x, f.y - y) < f.r * .8 + 12); }
   frame(dt, t) {
@@ -957,30 +1010,49 @@ class Tank {
   }
 }
 
+/* ---------- INMERSIÓN: al cruzar la superficie el agua se agita un momento y suben burbujas de a poco ---------- */
+let diveT = 99;
+const diveWave = t => t < .45 ? smooth(0, .45, t) : Math.exp(-(t - .45) * 1.5);   // sube suave y se apaga lento
+
 /* ---------- LOOP ---------- */
 layout();
-let last = performance.now(), skyT = -99, slow = 0;
+let last = performance.now(), skyT = -99, cloudT = -99, slow = 0;
 function frame(now) {
   requestAnimationFrame(frame);
   if (!SEA.ready) { last = now; return; }
   if (now - last < 1000 / SEA.fps - 3) return;                              // móvil: 30 fps sobran para una pecera
-  const t0 = performance.now(), dt = Math.min((now - last) / 1000, .066) * (SEA.reduced ? .5 : 1); last = now;
-  const t = tNow += dt;
-  SEA.scroll = scrollY; SEA.oy = Math.round(scrollY / SEA.px); SEA.budget3d = SEA.lite ? 1 : 2;
+  const oy = Math.round(scrollY / SEA.px), paused = SEA.paused;
+  if (paused && BG.drawn && oy === SEA.oy && !SEA.skyDirty && TANKS.every(tk => tk.drawn || !tk.visible)) { last = now; return; }   // en pausa solo se redibuja si algo cambió
+  const t0 = performance.now(), dt = paused ? 0 : Math.min((now - last) / 1000, .066) * (SEA.reduced ? .5 : 1); last = now;
+  const t = tNow += dt, top = oy * SEA.px, vy = dt ? (top - BG.view.top) / dt : 0;   // velocidad del scroll (px/s)
+  SEA.scroll = scrollY; SEA.oy = oy; BG.drawn = true;
   const h = hourNow(); SEA.light = lightAt(h); SEA.night = SEA.light.night;
-  BG.view.top = SEA.oy * SEA.px; BG.view.h = SEA.vh; BG.night = SEA.night; BG.speed = 1;
-  if (BG.view.top < SEA.surf + 40 && (SEA.skyDirty || t - skyT > (SEA.lite ? 4 : 2))) { drawSky(h, t); skyT = t; SEA.skyDirty = false; if (gl) upload(0, texSky, skyC, false); }
+  BG.view.top = top; BG.view.h = SEA.vh; BG.night = SEA.night; BG.speed = 1;
+  if (NAME.ok && (SEA.night > .55) !== NAME.night) buildName();
+  if (top < SEA.surf + 40) {                                                 // cielo visible: capas fijas + nubes que se desplazan
+    if (SEA.skyDirty || t - skyT > 6) { drawSkyLayers(h); skyT = t; }
+    if (SEA.skyDirty || t - cloudT > 60) { drawClouds(h); cloudT = t; }
+    SEA.skyDirty = false;
+    composeSky(t); if (gl) upload(0, texSky, skyC, false);
+  }
+  const sub = top > SEA.surf - 30;                                           // la línea del agua ya pasó el borde superior
+  if (SEA.sub !== undefined && sub !== SEA.sub && !SEA.reduced) diveT = 0;
+  SEA.sub = sub; diveT += dt; SEA.waveBoost = diveWave(diveT);
+  if (diveT < 1.2 && BG.bubbles.length < 260 && Math.random() < dt * (SEA.lite ? 14 : 28))
+    BG.bubbles.push({ x: rnd(0, SEA.vw), y: top + SEA.vh * rnd(.8, 1.1), r: rnd(0, 2) | 0, v: rnd(110, 220), ph: rnd(0, 6) });
   updateWater(BG, dt, t); updateMotes(dt, t);
-  if (BG.view.top + SEA.vh > SEA.surf + 200 && Math.random() < dt * (SEA.lite ? 2 : 4)) {   // cortina de burbujas en los bordes, como un aireador
+  if (sub && vy > 250 && BG.bubbles.length < 260)                           // al bajar rápido, las burbujas suben a tu lado
+    for (let i = Math.min(3, vy / 700 + Math.random()) | 0; i > 0; i--) BG.bubbles.push({ x: rnd(0, SEA.vw), y: top + SEA.vh + 10, r: rnd(0, 2) | 0, v: rnd(90, 160), ph: rnd(0, 6) });
+  if (top + SEA.vh > SEA.surf + 200 && Math.random() < dt * (SEA.lite ? 2 : 4)) {   // cortina de burbujas en los bordes, como un aireador
     const x = Math.random() < .5 ? SEA.vw * .05 : SEA.vw * .95;
-    BG.bubbles.push({ x: x + rnd(-5, 5), y: Math.min(BG.view.top + SEA.vh + 10, SEA.floor0), r: rnd(0, 2) | 0, v: rnd(70, 120), ph: rnd(0, 6) });
+    BG.bubbles.push({ x: x + rnd(-5, 5), y: Math.min(top + SEA.vh + 10, SEA.floor0), r: rnd(0, 2) | 0, v: rnd(70, 120), ph: rnd(0, 6) });
   }
   for (const g of BG.groups) g.update(dt, t);
-  if (SEA.bedTop < BG.view.top + SEA.vh + 600) { updateClam(dt, t); for (const s of shrimps) s.update(dt); for (const s of snails) s.update(dt); }
+  if (SEA.bedTop < top + SEA.vh + 600) { updateClam(dt, t); for (const s of shrimps) s.update(dt); for (const s of snails) s.update(dt); }
   drawFg(t);
   if (gl) { upload(1, texFg, fgC, true); renderGL(t); } else render2D();
   drawUI(t);
-  for (const tk of TANKS) if (tk.visible) tk.frame(dt, t);
+  for (const tk of TANKS) if (tk.visible && (!paused || !tk.drawn)) { tk.frame(dt, t); tk.drawn = true; }
   if (SEA.onTick) SEA.onTick(t);
   if (!SEA.lite) { slow = performance.now() - t0 > 12 ? slow + 1 : Math.max(0, slow - 1); if (slow > 40) goLite(); }   // si el equipo no da abasto, baja solo a modo liviano
 }

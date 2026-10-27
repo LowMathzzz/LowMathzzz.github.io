@@ -1,5 +1,5 @@
 'use strict';
-/* ===== Generadores procedurales de sprites pixel art (peces 2D/3D, gambas, caracoles) ===== */
+/* ===== Generadores procedurales de sprites pixel art (peces, gambas, caracoles) ===== */
 const NF = 8, PI2 = Math.PI * 2, PU = 3, PU2 = 2;
 const rnd = (a, b) => a + Math.random() * (b - a);
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -108,42 +108,6 @@ function sampleFish(S, V, k, comp) {
   return { pix, w, h };
 }
 
-/* ---------- PECES 3D: voxeliza la forma y la renderiza girada ---------- */
-const LIGHT3 = (() => { const v = [-.35, -.72, .6], l = Math.hypot(...v); return v.map(q => q / l); })();
-function render3D(sm, yaw, pitch = .26) {
-  const { pix, w, h } = sm, cx = w / 2, cyy = h / 2;
-  const cY = Math.cos(yaw), sY = Math.sin(yaw), cP = Math.cos(pitch), sP = Math.sin(pitch);
-  const rad = Math.ceil(Math.hypot(w, h) / 2) + 3, ow = rad * 2, oh = rad * 2;
-  const zb = new Float32Array(ow * oh).fill(-1e9), cb = new Array(ow * oh).fill(null);
-  const tAt = (x, y) => { const p = x >= 0 && y >= 0 && x < w && y < h ? pix[y * w + x] : null; return p && !p.fin ? p.t : 0; };
-  const Hx = LIGHT3[0], Hy = LIGHT3[1], Hz = LIGHT3[2] + 1, hl = Math.hypot(Hx, Hy, Hz);
-  for (let i = 0; i < pix.length; i++) {
-    const p = pix[i]; if (!p) continue;
-    const x = i % w, y = i / w | 0, t = p.fin ? 0 : p.t, n0 = Math.round(t);
-    const gx = (tAt(x + 1, y) - tAt(x - 1, y)) / 2, gy = (tAt(x, y + 1) - tAt(x, y - 1)) / 2;
-    for (let z = -n0; z <= n0; z++) {
-      let nx = 0, ny = 0, nz = 1;
-      if (!p.fin) { nx = -t * gx; ny = -t * gy; nz = z || .001; const l = Math.hypot(nx, ny, nz) || 1; nx /= l; ny /= l; nz /= l; }
-      const X = x + .5 - cx, Y = y + .5 - cyy, Z = z;
-      const X1 = X * cY - Z * sY, Z1 = X * sY + Z * cY, Y2 = Y * cP + Z1 * sP, Z2 = Z1 * cP - Y * sP;
-      const sx = Math.round(rad + X1), sy = Math.round(rad + Y2); if (sx < 0 || sy < 0 || sx >= ow || sy >= oh) continue;
-      const o = sy * ow + sx; if (Z2 <= zb[o]) continue;
-      const nx1 = nx * cY - nz * sY, nz1 = nx * sY + nz * cY, ny2 = ny * cP + nz1 * sP, nz2 = nz1 * cP - ny * sP;
-      const dot = nx1 * LIGHT3[0] + ny2 * LIGHT3[1] + nz2 * LIGHT3[2];
-      let c;
-      if (p.eye && Math.abs(z) === n0) c = p.eye;
-      else if (p.fin) c = p.c0.map(q => q * (.72 + .3 * Math.abs(dot)));
-      else { const sp = Math.pow(Math.max(0, (nx1 * Hx + ny2 * Hy + nz2 * Hz) / hl), 18) * .35; c = p.c0.map(q => q * (.42 + .72 * Math.max(0, dot)) + sp); }
-      zb[o] = Z2; cb[o] = { c, a: p.fin ? Math.min(1, p.a + .15) : 1, fin: p.fin };
-    }
-  }
-  for (let i = 0; i < cb.length; i++) if (!cb[i]) {                         // tapa huecos sueltos
-    const nb = [cb[i - 1], cb[i + 1], cb[i - ow], cb[i + ow]].filter(Boolean);
-    if (nb.length >= 3) cb[i] = nb[0];
-  }
-  return rasterize(cb, ow, oh);
-}
-
 /* ---------- ESPECIES ---------- */
 const FISH = {
   neon: { name: 'Neones', en: 'Neon tetras', cm: 3.6, count: 10, school: true, speed: 58, band: [.3, .75],
@@ -213,18 +177,11 @@ function scaleD(D, k) {
     pect: D.pect && [D.pect[0], D.pect[1], Math.max(1.5, s(D.pect[2]))],
     pelvic: D.pelvic && [D.pelvic[0], Math.round(s(D.pelvic[1]))] };
 }
-const YAW0 = .38, TURN_YAW = [.85, 1.25, Math.PI / 2], TURN_COMP = [.7, .45, .25];
-// sprites 2D de una variante (no guarda los píxeles intermedios: en móvil pesan); el voxel 3D se genera al pedirlo
+const TURN_COMP = [.7, .45, .25];
+// sprites de una variante: 8 frames de nado + 3 de giro en escorzo
 function fishSprites(S, V) {
   const frames = []; for (let f = 0; f < NF; f++) { const s = sampleFish(S, V, f, 1); frames.push(rasterize(s.pix, s.w, s.h)); }
-  return { S, V, frames, turn: TURN_COMP.map(c => { const s = sampleFish(S, V, 0, c); return rasterize(s.pix, s.w, s.h); }) };
-}
-function sprites3D(st) {
-  if (!st.v3) {
-    const sm = []; for (let f = 0; f < NF; f++) sm.push(sampleFish(st.S, st.V, f, 1));
-    st.v3 = { frames: sm.map(s => render3D(s, YAW0)), turn: TURN_YAW.map(y => render3D(sm[0], y)) };
-  }
-  return st.v3;
+  return { frames, turn: TURN_COMP.map(c => { const s = sampleFish(S, V, 0, c); return rasterize(s.pix, s.w, s.h); }) };
 }
 const fishSprite = (S, i) => S.s2[i] || (S.s2[i] = fishSprites(S, S.variants[i]));   // perezoso: solo las variantes que nadan
 for (const k in FISH) {

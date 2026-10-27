@@ -1,74 +1,67 @@
 'use strict';
-/* ===== Portfolio: idioma, navegación, profundímetro, día/noche, peceras chicas y contacto ===== */
+/* ===== Portfolio: idioma, navegación, indicador lateral, tema día/noche, tecnologías y contacto ===== */
 const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const store = {
   get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } },
   set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} },
 };
-const EMAIL = 'mateoloechle@outlook.com', CM = 60;   // la pecera mide 60 cm de la superficie al fondo
+const EMAIL = 'mateoloechle@outlook.com';
 
 /* ---------- TEXTOS EN INGLÉS (el español vive en el HTML) ---------- */
 const EN = {
-  skip: 'Skip to content', 'nav.about': 'About', 'nav.stack': 'Stack', 'nav.exp': 'Experience', 'nav.projects': 'Projects', 'nav.contact': 'Contact', 'nav.menu': 'Menu',
-  gauge: 'Depth', 'g.top': 'Surface', 'g.pearls': 'Pearls',
-  'hero.status': 'Open to work · Lima, Peru · Remote', 'hero.kicker': "Hi, I'm",
-  'hero.lede': 'I build secure backends and cross-platform apps: REST APIs, WebSockets and clean architectures that scale.',
-  'hero.stack': 'Main stack', 'hero.cta1': 'See projects →', 'hero.cta2': "Let's talk", 'hero.dive': 'Dive', 'hud.fish': 'fish',
-  'hero.hint': 'This is a real fish tank: <b>click</b> to feed, move fast and they flee, stay still and they come closer. <b>F</b> feeds · <b>T</b> knocks on the glass.',
-  'about.title': 'About me',
-  'about.p0': "Software engineer in Lima, Peru. I build the part you don't see —APIs, data and security— so everything else just works.",
-  'about.p1': 'Backend developer focused on <strong>Java and Spring Boot</strong>: REST APIs, WebSockets, WebHooks, data modeling and JWT security. I also build cross-platform mobile apps with <strong>Flutter</strong> and have worked on web projects with Angular, Vue and React.',
-  'about.p2': 'I work with <strong>AWS</strong> (EC2, Lambda), Docker and CI/CD on GitHub Actions and Jenkins, with observability in Grafana. I like clean, scalable architectures —microservices, event-driven, hexagonal, Clean Architecture— backed by tests in JUnit and Mockito.',
-  'about.f1': 'languages', 'about.f2': 'certifications', 'about.f3': 'CRM delivered end to end', 'about.f4': 'professional English',
-  'about.card': 'Species card', 'about.k1': 'Habitat', 'about.v1': 'Lima, Peru · open to remote', 'about.k2': 'Diet', 'about.v2': 'REST APIs, WebSockets and well-tested code',
-  'about.k3': 'Behavior', 'about.v3': "Curious. Swims toward hard problems and doesn't let go until they ship.", 'about.k4': 'Languages', 'about.v4': 'Spanish (native) · English (B2)',
-  'about.k5': 'Education', 'about.v5': 'Software Engineering — UPC (2022 – 2027)', 'about.k6': 'Status', 'about.v6': 'Open to new challenges',
-  'stack.title': 'Tech school', 'stack.sub': 'Every fish is a technology I work with. Filter by category, hover the list or drop some food into the tank.',
-  'stack.filter': 'Filter by category', 'cat.all': 'All', 'cat.lang': 'Languages', 'cat.data': 'Data',
-  'tank.title': 'Click: food · fast mouse: they flee', 'tank.demo': 'Click: food',
-  'stack.arch': 'Architecture & patterns', 'stack.method': 'Methodologies & tools', 'pill.micro': 'Microservices', 'pill.hex': 'Hexagonal',
-  'exp.title': 'Logbook', 'exp.sub': "Where I've been swimming: experience and education.",
-  'exp.a.when': 'Dec 2025 — Sep 2026', 'exp.a.where': 'Lima, Peru · remote', 'exp.a.note': 'Remote, with occasional on-site work',
-  'exp.a.b1': 'Built <strong>AAS-NET</strong> end to end: a CRM for insurance brokers that centralizes policies, installments and renewals, claims, clients and sub-agents, plus exportable reports.',
-  'exp.a.b2': "Built the platform's monolithic backend: business logic, REST API and data model to run the entire portfolio from a single system.",
-  'exp.a.b3': 'Secured the API with JWT authentication and hardening standards, with role-based access and permissions for sub-agents, administrative staff and managers.',
-  'exp.a.b4': 'Implemented database encryption and strengthened frontend security to protect sensitive client and policy data.',
-  'exp.a.b5': 'Delivered the complete system through to completion, working remotely and coordinating with the on-site team when needed.',
-  'exp.b.when': 'Mar 2022 — 2027 (expected)', 'exp.b.where': 'Lima, Peru', 'exp.b.title': 'B.S. in Software Engineering', 'exp.b.note': 'Universidad Peruana de Ciencias Aplicadas · in progress',
-  'exp.b.b1': 'Applied software engineering principles, the software development life cycle (SDLC), design and testing to build solid, maintainable solutions.',
-  'exp.b.b2': 'Went deep into advanced data structures and algorithm analysis to optimize time and memory usage.',
-  'exp.b.b3': 'Designed data models in relational and NoSQL databases, prioritizing consistency, performance and scalability.',
-  'tag.rest': 'REST API', 'tag.rbac': 'Roles & permissions', 'tag.enc': 'DB encryption', 'tag.reports': 'Reports', 'tag.ds': 'Data structures', 'tag.algo': 'Algorithms', 'tag.proc': 'Procedural pixel art',
-  'projects.title': 'Projects', 'projects.sub': "What I've built, from the surface to the seabed.",
-  'p1.badge': '★ Professional work', 'p1.sub': 'CRM for insurance brokers',
-  'p1.desc': 'Centralizes policies, installments and renewals, claims, clients and sub-agents, with exportable reports. I built it end to end and delivered it complete.',
-  'p1.b1': 'Monolithic backend with a REST API and a data model to run the entire portfolio from a single system.',
-  'p1.b2': 'JWT and hardening, with roles and permissions for sub-agents, administrative staff and managers.',
-  'p1.b3': 'Encrypted database and a hardened frontend to protect sensitive client and policy data.',
-  'p2.when': 'Personal project · 2025 — present', 'p2.sub': 'Operations management for restaurants and grills',
-  'p2.desc': 'A modular web platform: attendance and payroll, expenses and accounts payable, sales reconciliation, recipe-based inventory and goods receiving.',
-  'p2.b1': 'Automates Excel processing (biometric logs, sales reports, supplier orders) to calculate late arrivals, deductions and salaries.',
-  'p2.b2': 'Layered security: encryption of sensitive data, role-based access control, expiring sessions and abuse protection.',
-  'p2.m1': 'Payroll', 'p2.m2': 'Expenses', 'p2.m3': 'Sales', 'p2.m4': 'Inventory',
-  'p3.when': 'Personal project · 2026', 'p3.sub': 'Interactive wallpaper for Wallpaper Engine', 'p3.live': 'Live',
-  'p3.desc': "A pixel-art aquarium that follows your PC's real clock: code-generated fish, shrimp and snails that eat, flee, sleep and hide. This website runs on its engine.",
-  'p3.b1': '11 procedurally generated fish species (2D and 3D voxel), 19 shrimp varieties and schooling behavior with boids.',
-  'p3.b2': 'WebGL glass, water and light shader: refraction, caustics, sun rays and a day/night cycle.',
-  'p3.toggle': 'See the fish in 3D voxels', 'p3.toggle2': 'Back to 2D pixel art',
-  'pearls.title': 'Pearls', 'pearls.sub': 'Certifications and courses. Each certification is a pearl; each course, a shell. One is still forming.',
-  'c.mongo': 'Introduction to MongoDB', 'c.scrum': 'Scrum Fundamentals', 'c.java': 'Java (basic)', 'c.flutter': 'Flutter — mobile development', 'c.micro': 'Microservices development', 'c.cyber': 'Cybersecurity Analyst',
-  'k.cert': 'Certification', 'k.course': 'Course', 'k.wip': 'In progress',
-  'contact.title': "Let's talk", 'contact.big': 'Got a project, a team or an idea that needs a solid backend? Write to me.',
-  'contact.sub': 'Available for backend, mobile and full-stack roles — remote or in Lima.', 'contact.copy': 'copy', 'contact.cv': 'Download résumé (PDF, Spanish)',
-  'form.title': 'Message in a bottle', 'form.name': 'Name', 'form.msg': 'Message', 'form.ph': 'What are you working on?', 'form.send': 'Throw the bottle →',
-  'form.note': 'Your email app will open with the message ready to send.',
-  foot: 'Handmade with HTML, Canvas and WebGL. No frameworks, just fish.',
+  skip: 'Skip to content', 'nav.label': 'Sections', 'nav.home': 'Home', 'nav.profile': 'Profile', 'nav.work': 'Projects', 'nav.tech': 'Technologies',
+  'nav.bg': 'Background', 'nav.contact': 'Contact', 'nav.menu': 'Menu',
+  'hero.lede': 'I design and build secure backends with Java and Spring Boot, and cross-platform apps with Flutter.',
+  'hero.open': 'Open to new opportunities', 'hero.where': 'Lima, Peru · remote or on-site', 'hero.time': 'Time in Lima',
+  'hero.cta1': 'Get in touch', 'hero.cta2': 'View résumé', 'hero.hint': 'Interactive background: click the water or move your cursor.', 'hero.down': 'Go to profile',
+  'profile.title': 'Software engineer based in Lima, Peru.', 'profile.facts': 'In short',
+  'profile.p0': 'I focus on backend with Java and Spring Boot and on mobile apps with Flutter.',
+  'profile.p1': 'At Arias y Arias Corredores de Seguros I built AAS-NET end to end, the CRM the brokerage uses to manage policies, installments, claims and sub-agents. On my own I am building DoxaCore, a web platform for the daily operations of restaurants.',
+  'profile.p2': "I'm especially interested in security —JWT, role-based access control, data encryption— and I work with clean architectures tested with JUnit and Mockito. I have also built web projects with Angular, Vue and React, and I deploy on AWS with Docker and CI/CD.",
+  'now.title': 'Right now', 'now.1': 'Looking for my next backend or mobile role', 'now.2': 'Training as a Cybersecurity Analyst',
+  'now.3': 'Building DoxaCore', 'now.4': 'Studying Software Engineering at UPC (graduating 2027)',
+  'profile.k2': 'Location', 'profile.v2': 'Lima, Peru (GMT-5)', 'profile.k3': 'Work mode', 'profile.v3': 'Remote or on-site in Lima',
+  'profile.k4': 'Languages', 'profile.v4': 'Spanish (native) · English (B2)', 'profile.k5': 'Education', 'profile.v5': 'Software Engineering, UPC (2027)',
+  'work.eyebrow': 'Projects', 'work.title': 'Recent work', 'tab1.s': 'CRM · 2025 – 2026', 'tab2.s': 'Restaurants · 2025 – present',
+  'c.role': 'Role', 'c.sec': 'Security', 'c.practices': 'Practices', 'c.period': 'Period', 'c.mode': 'Work mode', 'c.type': 'Type', 'c.status': 'Status',
+  'c1.when': 'Dec 2025 — Sep 2026', 'c1.sub': 'CRM for insurance brokers', 'c1.mode': 'Remote, occasionally on-site', 'c1.status': 'Delivered',
+  'c1.desc': "A system that centralizes the brokerage's operations: policies, installments and renewals, claims, clients, sub-agents and exportable reports. I built it end to end, from the data model to delivery.",
+  'c1.b1': 'Monolithic backend with the business logic, REST API and data model for the entire portfolio.',
+  'c1.b2': 'Modules for policies, installments and renewals, claims, clients and sub-agents, with exportable reports.',
+  'c1.s1': 'JWT authentication and hardening standards on the API.', 'c1.s2': 'Roles and permissions for sub-agents, administrative staff and managers.',
+  'c1.s3': 'Database encryption and strengthened frontend security.', 'c1.h3': 'Delivery',
+  'c1.d1': 'Complete system delivered through to completion.', 'c1.d2': 'Remote work, coordinating with the on-site team when needed.',
+  'c1.stack': 'REST API · JWT · Role-based access control · Data encryption · Hardening · Reports',
+  'c2.kind': 'Personal project', 'c2.status': 'In development', 'c2.when': '2025 — present', 'c2.sub': 'Operations management for restaurants and grills', 'c2.role': 'Design and full development',
+  'c2.desc': "A modular web platform for a restaurant's daily operations: attendance and payroll, expenses and accounts payable, sales reconciliation, recipe-based inventory and goods receiving.",
+  'c2.m1': 'Payroll', 'c2.m2': 'Expenses', 'c2.m3': 'Sales', 'c2.m4': 'Inventory', 'c2.m5': 'Receiving',
+  'c2.h1': 'Automation', 'c2.b1': 'Automatic processing of Excel files: biometric logs, sales reports and supplier orders.',
+  'c2.b2': 'Calculation of late arrivals, deductions and salaries from that data.',
+  'c2.s1': 'Encryption of sensitive data and role-based access control.', 'c2.s2': 'Expiring sessions and abuse protection.',
+  'c2.h3': 'Modules', 'c2.d1': 'Payroll, expenses and accounts payable.', 'c2.d2': 'Sales reconciliation and recipe-based inventory.',
+  'tech.title': 'Tools I work with.', 'tech.filter': 'Filter by area', 'cat.all': 'All', 'cat.lang': 'Languages', 'cat.back': 'Backend & testing',
+  'cat.cloud': 'Cloud & DevOps', 'cat.data': 'Data', 'cat.front': 'Front-end & mobile',
+  'tech.arch': 'Architecture & patterns', 'tech.method': 'Methodologies & tools', 'pill.micro': 'Microservices', 'pill.hex': 'Hexagonal architecture',
+  'bg.title': 'Experience and education.', 'bg.cv': 'View full résumé', 'bg.org1': 'Arias y Arias Corredores de Seguros · Lima, Peru (remote)',
+  'tag.rest': 'REST API', 'tag.enc': 'Encryption', 'tag.remote': 'Remote',
+  'bg.job1': "End-to-end development of AAS-NET, the brokerage's CRM: backend, REST API, data model and security with JWT, roles and encryption, through delivery of the complete system.",
+  'bg.when2': 'Mar 2022 — 2027', 'bg.deg': 'B.S. in Software Engineering', 'bg.org2': 'Universidad Peruana de Ciencias Aplicadas (UPC) · in progress, expected 2027',
+  'bg.e1': 'Software engineering, the software development life cycle (SDLC), design and testing.',
+  'bg.e2': 'Advanced data structures and algorithm analysis to optimize time and memory.',
+  'bg.e3': 'Data modeling in relational and NoSQL databases: consistency, performance and scalability.',
+  'bg.certs': 'Certifications', 'bg.courses': 'Courses',
+  'cert.mongo': 'Introduction to MongoDB', 'cert.scrum': 'Scrum Fundamentals', 'cert.java': 'Java (basic)', 'cert.flutter': 'Flutter — mobile development',
+  'cert.micro': 'Microservices development', 'cert.cyber': 'Cybersecurity Analyst', 'cert.wip': 'in progress',
+  'contact.title': 'Have a role or a project in mind?', 'contact.big': "I'm open to backend, mobile or full-stack roles, remote or in Lima. Write to me and let's talk.",
+  'contact.copy': 'Copy',
+  foot: 'Designed and built by me · HTML, CSS, JavaScript and WebGL',
 };
 const TXT = {
-  es: { day: 'día', night: 'noche', dawn: 'amanecer', dusk: 'atardecer', copied: '¡Email copiado!', sent: 'Botella lanzada: revisa tu correo', modes: ['Ciclo real: sigue tu hora local', 'Siempre de día', 'Siempre de noche'], toggle3d: ['Ver los peces en voxel 3D', 'Volver al pixel art 2D'] },
-  en: { day: 'day', night: 'night', dawn: 'dawn', dusk: 'dusk', copied: 'Email copied!', sent: 'Bottle thrown: check your email app', modes: ['Real cycle: follows your local time', 'Always day', 'Always night'], toggle3d: ['See the fish in 3D voxels', 'Back to 2D pixel art'] },
+  es: { copied: 'Email copiado', modes: ['Tema automático según tu hora', 'Tema de día', 'Tema de noche'], motion: ['Pausar animación', 'Reanudar animación'] },
+  en: { copied: 'Email copied', modes: ['Automatic theme by your local time', 'Day theme', 'Night theme'], motion: ['Pause animation', 'Resume animation'] },
 };
 const tx = k => TXT[SEA.lang][k];
+const setText = (el, v) => { v = String(v); if (el.textContent !== v) el.textContent = v; };   // escribir solo si cambió: no invalida el layout
 
 /* ---------- IDIOMA ---------- */
 function setLang(l) {
@@ -83,11 +76,11 @@ function setLang(l) {
     el.setAttribute(attr, l === 'en' ? (EN[key] ?? el.dataset[k]) : el.dataset[k]);
   }
   for (const b of $$('[data-lang]')) b.setAttribute('aria-pressed', String(b.dataset.lang === l));
-  themeUI(); styleUI(); hud();
+  themeUI(); motionUI(); clock();
 }
 for (const b of $$('[data-lang]')) b.addEventListener('click', () => setLang(b.dataset.lang));
 
-/* ---------- DÍA / NOCHE ---------- */
+/* ---------- TEMA DÍA / NOCHE ---------- */
 const MODES = ['auto', 'day', 'night'], ICONS = ['◐', '☀', '☾'];
 function themeUI() {
   const i = MODES.indexOf(SEA.theme), b = $('#theme-btn');
@@ -98,44 +91,40 @@ $('#theme-btn').addEventListener('click', () => {
   store.set('theme', SEA.theme); themeUI(); toast(tx('modes')[MODES.indexOf(SEA.theme)]);
 });
 
-/* ---------- PECES EN 2D O VOXEL 3D ---------- */
-function styleUI() { const b = $('#style-btn'); if (b) b.textContent = tx('toggle3d')[SEA.style === '3d' ? 1 : 0]; }
-$('#style-btn').addEventListener('click', () => { SEA.style = SEA.style === '3d' ? '2d' : '3d'; styleUI(); });
+/* ---------- PAUSAR EL FONDO (contenido en movimiento: WCAG 2.2.2) ---------- */
+function motionUI() { setText($('#motion-btn'), tx('motion')[SEA.paused ? 1 : 0]); document.documentElement.classList.toggle('paused', SEA.paused); }
+$('#motion-btn').addEventListener('click', () => { SEA.paused = !SEA.paused; store.set('motion', SEA.paused ? 'off' : 'on'); motionUI(); });
 
-/* ---------- HUD DE LA PECERA ---------- */
-const setText = (el, v) => { v = String(v); if (el.textContent !== v) el.textContent = v; };   // escribir solo si cambió: no invalida el layout
-function hud() {
-  const d = new Date(), L = SEA.light;
-  setText($('#hud-time'), d.toLocaleTimeString(SEA.lang === 'en' ? 'en-US' : 'es-PE', { hour: '2-digit', minute: '2-digit' }));
-  if (!L) return;
-  const mode = L.night > .65 ? 'night' : L.elev < .25 ? (L.h < 12 ? 'dawn' : 'dusk') : 'day';
-  setText($('#hud-mode'), tx(mode));
-  setText($('#hud-fish'), allFish().length);
+/* ---------- HORA EN LIMA ---------- */
+function clock() {
+  const v = new Date().toLocaleTimeString(SEA.lang === 'en' ? 'en-US' : 'es-PE', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Lima' });
+  for (const el of $$('.lima-time')) setText(el, v);
 }
+setInterval(clock, 15000);
 
-/* ---------- PROFUNDÍMETRO, NAV ACTIVA Y AVISOS ---------- */
+/* ---------- INDICADOR LATERAL, NAV ACTIVA Y AVISOS ---------- */
 // las posiciones se miden solo cuando cambia el layout; por frame se usan transforms (no fuerzan layout)
-const SECS = ['top', 'about', 'stack', 'experience', 'projects', 'pearls', 'contact'];
-const G = { gauge: $('.gauge'), track: $('.gauge-track'), fill: $('.gauge-fill'), fish: $('.gauge-fish'), val: $('#depth-val'), nav: $('#nav'), links: $$('.gauge-marks a, .nav-links a') };
-const depthAt = y => clamp((y - SEA.surf) / (SEA.floor0 - SEA.surf), 0, 1);
+const SECS = ['top', 'profile', 'work', 'tech', 'background', 'contact'];
+const G = { gauge: $('.gauge'), track: $('.gauge-track'), fill: $('.gauge-fill'), fish: $('.gauge-fish'), bar: $('.nav-progress'), nav: $('#nav'), links: $$('.gauge-marks a, .nav-links a') };
+const progressAt = y => clamp((y - SEA.surf) / (SEA.floor0 - SEA.surf), 0, 1);
 const secTop = id => { const el = document.getElementById(id); return el ? el.getBoundingClientRect().top + scrollY : 0; };
-let tops = [], trackH = 0;
+let tops = [], trackH = 0, maxY = 1;
 function placeMarks() {
   tops = SECS.map(id => [id, secTop(id)]);
   trackH = getComputedStyle(G.gauge).display === 'none' ? 0 : G.track.clientHeight;
-  for (const a of $$('.gauge-marks a')) a.parentElement.style.top = (a.dataset.sec === 'top' ? 0 : depthAt(secTop(a.dataset.sec) + 140)) * 100 + '%';
-  for (const b of $$('[data-depth]')) setText(b, Math.round(depthAt(secTop(b.dataset.depth) + 140) * CM));
-  lastD = -1;
+  maxY = Math.max(1, document.documentElement.scrollHeight - innerHeight);
+  for (const a of $$('.gauge-marks a')) a.parentElement.style.top = (a.dataset.sec === 'top' ? 0 : progressAt(secTop(a.dataset.sec) + 140)) * 100 + '%';
+  lastP = -1;
 }
 SEA.onLayout = placeMarks;
-let lastY = 0, lastD = -1, lastSec = '', solid = null, nightAttr = null, tickN = 0;
+let lastY = 0, lastP = -1, lastB = -1, lastSec = '', solid = null, nightAttr = null;
 SEA.onTick = () => {
-  const y = scrollY, d = depthAt(y + SEA.vh * .5);
-  if (trackH && Math.abs(d - lastD) > .0004) {
-    lastD = d;
-    G.fill.style.transform = `scaleY(${d.toFixed(4)})`;
-    G.fish.style.transform = `translate(-50%, ${(d * trackH - 8).toFixed(1)}px)`;
-    setText(G.val, Math.round(d * CM));
+  const y = scrollY, p = progressAt(y + SEA.vh * .5), b = clamp(y / maxY, 0, 1);
+  if (Math.abs(b - lastB) > .0005) { lastB = b; G.bar.style.transform = `scaleX(${b.toFixed(4)})`; }   // barra de progreso: reemplaza al scroll oculto
+  if (trackH && Math.abs(p - lastP) > .0004) {
+    lastP = p;
+    G.fill.style.transform = `scaleY(${p.toFixed(4)})`;
+    G.fish.style.transform = `translate(-50%, ${(p * trackH - 8).toFixed(1)}px)`;
   }
   if (Math.abs(y - lastY) > 2) { G.fish.classList.toggle('left', y < lastY); lastY = y; }
   let cur = 'top'; for (const [id, top] of tops) if (top <= y + SEA.vh * .45) cur = id;
@@ -143,7 +132,6 @@ SEA.onTick = () => {
   if ((y > 40) !== solid) { solid = y > 40; G.nav.classList.toggle('solid', solid); }
   const night = SEA.night > .55;
   if (night !== nightAttr) { nightAttr = night; document.documentElement.toggleAttribute('data-night', night); }
-  if (++tickN % 30 === 0) hud();
 };
 let toastT = 0;
 function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2200); }
@@ -152,14 +140,11 @@ function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.ad
 $('#menu-btn').addEventListener('click', () => { const open = $('#nav').classList.toggle('open'); $('#menu-btn').setAttribute('aria-expanded', String(open)); });
 for (const a of $$('.nav-links a')) a.addEventListener('click', () => { $('#nav').classList.remove('open'); $('#menu-btn').setAttribute('aria-expanded', 'false'); });
 
-/* ---------- APARECER AL BUCEAR ---------- */
+/* ---------- APARECER AL HACER SCROLL ---------- */
 const io = new IntersectionObserver(es => { for (const e of es) if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }, { threshold: .12 });
 for (const el of $$('.reveal')) io.observe(el);
 
-/* ---------- CINTA: se duplica para que el loop no tenga corte ---------- */
-const track = $('.ticker-track'); track.innerHTML += track.innerHTML;
-
-/* ---------- CARDUMEN TECNOLÓGICO: cada tecnología es un pez con los colores de su marca ---------- */
+/* ---------- TECNOLOGÍAS: cada una se dibuja con los colores de su marca ---------- */
 const TECH = {
   Java: ['goldfish', { b: '#f0861a', top: '#d8650a', bel: '#ffc070', f: '#5382a1' }],
   Kotlin: ['guppy', { t1: '#7f52ff', t2: '#e44857' }], Dart: ['guppy', { t1: '#0175c2', t2: '#13b9fd' }],
@@ -198,22 +183,28 @@ for (const c of $$('.chip')) c.addEventListener('click', () => {
   for (const g of techTank.groups) { g.pick(); for (const f of g.members) f.fade = cat === 'all' || f.cat === cat ? 1 : .16; }
 });
 for (const li of $$('#tech-list li')) {
-  li.addEventListener('mouseenter', () => {
-    techTank.hot = li.dataset.tech; li.classList.add('hot');
-    const f = techTank.groups.flatMap(g => g.members).find(f => f.label === li.dataset.tech); if (f) f.say('♥', 1.4);
-  });
+  li.addEventListener('mouseenter', () => { techTank.hot = li.dataset.tech; li.classList.add('hot'); });
   li.addEventListener('mouseleave', () => { techTank.hot = null; li.classList.remove('hot'); });
 }
 
-/* ---------- DEMO EN VIVO DE LA PECERA PIXEL ---------- */
-new Tank($('#demo-tank'), tk => {
-  const band = () => ({ x0: tk.lim.x0, x1: tk.lim.x1, y0: 34, y1: tk.h - 30 });
-  for (const [k, n] of [['neon', 7], ['guppy', 3], ['betta', 1], ['cory', 3], ['platy', 2]]) {
-    const g = new Group(tk, band), sp = FISH[k];
-    tk.groups.push(g);
-    for (let i = 0; i < n; i++) later(() => addFish(g, sp, fishSprite(sp, i % sp.variants.length)));
+/* ---------- PROYECTOS: pestañas (sin JS se ven los dos) ---------- */
+const tabs = $$('.tab');
+function showTab(t, anim) {
+  for (const o of tabs) {
+    const on = o === t, panel = document.getElementById(o.getAttribute('aria-controls'));
+    o.setAttribute('aria-selected', String(on)); o.tabIndex = on ? 0 : -1; panel.hidden = !on;
+    if (on && anim) { panel.classList.remove('swap'); void panel.offsetWidth; panel.classList.add('swap'); }
   }
-});
+}
+for (const t of tabs) {
+  t.addEventListener('click', () => showTab(t, true));
+  t.addEventListener('keydown', e => {
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+    const n = tabs[(tabs.indexOf(t) + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length];
+    showTab(n, true); n.focus();
+  });
+}
+showTab(tabs[0]);
 
 /* ---------- CONTACTO ---------- */
 for (const b of $$('[data-copy]')) b.addEventListener('click', () => {
@@ -221,23 +212,12 @@ for (const b of $$('[data-copy]')) b.addEventListener('click', () => {
   if (navigator.clipboard) navigator.clipboard.writeText(b.dataset.copy).then(done, () => { location.href = 'mailto:' + EMAIL; });
   else location.href = 'mailto:' + EMAIL;
 });
-const BOTTLE = '<svg viewBox="0 0 11 19"><path fill="#b98a5a" d="M4 0h3v2H4z"/><path fill="#9fe6d8" d="M4 2h3v3h1v1h1v1h1v11H1V7h1V6h1V5h1z"/><path fill="#f6efd8" d="M3 9h5v6H3z"/><path fill="#fff" d="M2 8h1v4H2z"/></svg>';
-$('#bottle').addEventListener('submit', e => {
-  e.preventDefault();
-  const f = e.target, d = new FormData(f), name = String(d.get('name')).trim(), from = String(d.get('email')).trim();
-  const subject = (SEA.lang === 'en' ? 'Hi Mateo — message from ' : 'Hola Mateo — mensaje de ') + name;
-  const body = `${String(d.get('msg')).trim()}\n\n— ${name} · ${from}`;
-  const r = f.querySelector('.btn').getBoundingClientRect(), b = document.createElement('div');
-  b.className = 'bottle-fly'; b.innerHTML = BOTTLE; b.style.left = r.left + r.width / 2 + 'px'; b.style.top = r.top - 20 + 'px';
-  document.body.appendChild(b); setTimeout(() => b.remove(), 2600);
-  toast(tx('sent'));
-  location.href = `mailto:${EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-});
 
 /* ---------- ARRANQUE ---------- */
 $('#year').textContent = new Date().getFullYear();
 SEA.theme = MODES.includes(store.get('theme')) ? store.get('theme') : 'auto';
+SEA.paused = store.get('motion') ? store.get('motion') === 'off' : SEA.reduced;
 setLang(store.get('lang') || ((navigator.language || 'es').toLowerCase().startsWith('es') ? 'es' : 'en'));
 placeMarks();
-console.log('%c ><(((º>  %c¿Buscando bugs? Aquí solo hay peces.', 'color:#ffd25a;font:700 16px monospace', 'color:#7fd2c2;font:14px monospace');
-console.log('%c' + EMAIL + ' · github.com/LowMathzzz', 'color:#bcd8d1;font:12px monospace');
+console.log('%cMateo Loechle — Software Engineer', 'font:700 14px system-ui');
+console.log(EMAIL + ' · github.com/LowMathzzz');
