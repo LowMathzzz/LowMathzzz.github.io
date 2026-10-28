@@ -126,13 +126,13 @@
       </header>
       <div class="about-grid">
         <div class="panel about-text reveal">
-          <p class="big" data-i18n="profile.p0">Ingeniero de software en Lima, Perú. Me enfoco en backend con Java y Spring Boot y en aplicaciones móviles con Flutter.</p>
-          <p data-i18n="profile.p1">Me interesa especialmente la seguridad de las aplicaciones —autenticación con JWT, control de acceso por roles y cifrado de datos— y diseñar sistemas que sigan siendo fáciles de mantener a medida que crecen.</p>
-          <p data-i18n="profile.p2">También me atraen las arquitecturas limpias y orientadas a eventos, el desarrollo móvil multiplataforma y la automatización de despliegues en la nube.</p>
+          <p class="big" data-i18n="profile.p0">Construyo backends seguros y escalables con Java y Spring Boot, y apps multiplataforma con Flutter.</p>
+          <p data-i18n="profile.p1">Me apasiona la seguridad de las APIs: autenticación con JWT, control de acceso por roles, cifrado de datos y hardening. Diseño con arquitectura hexagonal y Clean Architecture para que el dominio nunca dependa del framework, y uso Kafka cuando los servicios necesitan hablar por eventos sin acoplarse.</p>
+          <p data-i18n="profile.p2">Llevo el código a producción con Docker y pipelines de CI/CD en GitHub Actions y Jenkins, probado con JUnit y Mockito, sobre AWS y Azure y con Grafana para ver en vivo qué pasa. Estudio Ingeniería de Software en la UPC (Lima) y me formo como Backend Developer.</p>
           <h3 class="tiny" data-i18n="now.title">Ahora mismo</h3>
           <ul class="fish-list">
             <li><svg class="mini-fish" aria-hidden="true"><use href="#i-fish"/></svg><span data-i18n="now.1">Buscando mi próximo rol de backend o mobile</span></li>
-            <li><svg class="mini-fish" aria-hidden="true"><use href="#i-fish"/></svg><span data-i18n="now.2">Formándome como Analista de Ciberseguridad</span></li>
+            <li><svg class="mini-fish" aria-hidden="true"><use href="#i-fish"/></svg><span data-i18n="now.2">Formándome como Backend Developer</span></li>
             <li><svg class="mini-fish" aria-hidden="true"><use href="#i-fish"/></svg><span data-i18n="now.4">Cursando Ingeniería de Software en la UPC (egreso 2027)</span></li>
           </ul>
         </div>
@@ -182,16 +182,16 @@
           </ul>
         </div>
         <div class="project-body">
-          <p class="project-desc" data-i18n="c1.desc">Sistema que centraliza la operación de la corredora: pólizas, cuotas y vencimientos, siniestros, clientes, subagentes y reportes exportables. Lo desarrollé de punta a punta, desde el modelo de datos hasta la entrega.</p>
+          <p class="project-desc" data-i18n="c1.desc">Plataforma que concentra toda la operación de la corredora en un solo sistema: pólizas, cuotas y vencimientos, siniestros, clientes, subagentes y reportes exportables. La construí de punta a punta: modelo de datos, API, seguridad, despliegue y entrega.</p>
           <ul class="bul">
-            <li data-i18n="c1.b1">Backend monolítico con la lógica de negocio, la API REST y el modelo de datos de toda la cartera.</li>
-            <li data-i18n="c1.s1">Autenticación con JWT y estándares de hardening en la API.</li>
-            <li data-i18n="c1.s2">Roles y permisos para subagentes, administrativos y gerentes.</li>
-            <li data-i18n="c1.s3">Cifrado de la base de datos y refuerzo de la seguridad del frontend.</li>
-            <li data-i18n="c1.d2">Trabajo remoto, coordinando con el equipo en sitio cuando fue necesario.</li>
+            <li data-i18n="c1.b1">Backend modular en Spring Boot 3 y Java 21, con API REST documentada en OpenAPI y modelo de datos en PostgreSQL para toda la cartera.</li>
+            <li data-i18n="c1.s1">Autenticación stateless con Spring Security y JWT, y hardening de la API: validación de entrada, rate limiting y cabeceras seguras.</li>
+            <li data-i18n="c1.s2">Control de acceso por roles (RBAC) para subagentes, administrativos y gerentes, aplicado en cada endpoint.</li>
+            <li data-i18n="c1.s3">Cifrado de datos sensibles en reposo y refuerzo de la seguridad del frontend para proteger clientes y pólizas.</li>
+            <li data-i18n="c1.d2">Contenedores Docker y pipeline de CI/CD en GitHub Actions; trabajo remoto coordinado con el equipo en sitio.</li>
           </ul>
         </div>
-        <ul class="tags"><li data-i18n="tag.rest">API REST</li><li>JWT</li><li data-i18n="tag.rbac">Roles y permisos</li><li data-i18n="tag.enc">Cifrado de BD</li><li>Hardening</li><li data-i18n="tag.reports">Reportes</li></ul>
+        <ul class="tags"><li>Java 21</li><li>Spring Boot 3</li><li>Spring Security</li><li>PostgreSQL</li><li>JWT</li><li>OpenAPI</li><li>Docker</li><li>GitHub Actions</li></ul>
       </article>
 
       <article class="panel project reveal" id="doxacore" role="tabpanel" aria-labelledby="tab-doxa">
@@ -205,15 +205,16 @@
           </ul>
         </div>
         <div class="project-body">
-          <p class="project-desc" data-i18n="c2.desc">Plataforma web modular para la operación diaria de un restaurante: asistencia y planilla, gastos y cuentas por pagar, conciliación de ventas, inventarios con recetas y recepción de productos.</p>
+          <p class="project-desc" data-i18n="c2.desc">Plataforma SaaS modular para la operación diaria de restaurantes y parrillas: asistencia y planilla, gastos y cuentas por pagar, conciliación de ventas, inventario por recetas y recepción de mercadería, todo desde un solo panel.</p>
           <ul class="bul">
-            <li data-i18n="c2.b1">Procesamiento automático de archivos Excel: biométrico, reportes de ventas y pedidos de proveedores.</li>
-            <li data-i18n="c2.b2">Cálculo de tardanzas, descuentos y sueldos a partir de esos datos.</li>
-            <li data-i18n="c2.s1">Cifrado de datos sensibles y control de acceso por roles.</li>
-            <li data-i18n="c2.s2">Sesiones con expiración y protección contra abuso.</li>
+            <li data-i18n="c2.b1">Ingesta automática de archivos Excel (marcaciones biométricas, reportes de ventas y pedidos de proveedores) con Apache POI y procesamiento asíncrono.</li>
+            <li data-i18n="c2.b2">Motor de cálculo de tardanzas, descuentos y sueldos a partir de esos datos, sin planillas manuales.</li>
+            <li data-i18n="c2.b3">Frontend en React y TypeScript con dashboards de ventas, costos y personal.</li>
+            <li data-i18n="c2.s1">Cifrado de datos sensibles y control de acceso por roles con Spring Security.</li>
+            <li data-i18n="c2.s2">Sesiones con expiración en Redis y rate limiting contra abuso; desplegado con Docker en AWS.</li>
           </ul>
         </div>
-        <ul class="tags"><li>Python</li><li>Flask</li><li>MySQL</li><li>pandas</li><li>Jinja2</li><li>Chart.js</li></ul>
+        <ul class="tags"><li>Java 21</li><li>Spring Boot 3</li><li>PostgreSQL</li><li>Redis</li><li>React</li><li>TypeScript</li><li>Docker</li><li>AWS</li></ul>
       </article>
     </div>
   </section>
@@ -334,7 +335,7 @@
             <li><svg aria-hidden="true"><use href="#i-book"/></svg><span>Spring Boot</span></li>
             <li><svg aria-hidden="true"><use href="#i-book"/></svg><span data-i18n="cert.flutter">Flutter — desarrollo móvil</span></li>
             <li><svg aria-hidden="true"><use href="#i-book"/></svg><span data-i18n="cert.micro">Desarrollo de microservicios</span></li>
-            <li class="wip"><svg aria-hidden="true"><use href="#i-book"/></svg><span data-i18n="cert.cyber">Analista de Ciberseguridad</span><em data-i18n="cert.wip">en curso</em></li>
+            <li class="wip"><svg aria-hidden="true"><use href="#i-book"/></svg><span data-i18n="cert.cyber">Backend Developer</span><em data-i18n="cert.wip">en curso</em></li>
           </ul>
         </div>
       </div>

@@ -315,7 +315,25 @@ html[data-night] .tank { background: linear-gradient(180deg, #13234f 0%, #0d1a3c
 }
 @media (max-width: 699px) { :root { --frame: 18px; } }
 @media (max-width: 560px) {
-  body { font-size: 17px; }
+  /* móvil: menos relleno y texto un punto más chico para que no se sature la pantalla */
+  body { font-size: 15.5px; }
+  .section { padding-top: 72px; }
+  .big { font-size: 18px; }
+  .lede { font-size: 16px; }
+  .project-desc { font-size: 16.5px; }
+  .about-text, .project, .contact-card, .bottle { padding: 18px 16px; }
+  .cv { padding: 2px 16px; }
+  .cv-row { padding: 18px 0; }
+  .project-meta li { padding: 5px 7px; font-size: 12px; }
+  .project-body { margin-top: 18px; padding-top: 18px; gap: 18px; }
+  .bul li { margin-bottom: 7px; }
+  .species-head { padding: 14px 16px; }
+  .species dl { padding: 2px 16px 10px; }
+  .species dl > div { padding: 8px 0; }
+  .species dd { font-size: 15px; }
+  .tech-list li { padding: 5px 6px; font-size: 12.5px; }
+  .badges { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .badges li { padding: 8px 10px; font-size: 14.5px; gap: 9px; }
   .brand span { display: none; }
   .nav { gap: 10px; padding-left: 10px; width: calc(100% - 28px); }
   #tech-tank { height: 340px; }
@@ -326,7 +344,6 @@ html[data-night] .tank { background: linear-gradient(180deg, #13234f 0%, #0d1a3c
   .tabs { width: 100%; }
   .tab { flex: 1 1 0; min-width: 0; }
   .species dl > div { grid-template-columns: 1fr; gap: 2px; }
-  .badges { grid-template-columns: minmax(0, 1fr); }
   .sec-head { flex-wrap: wrap; gap: 10px 14px; }
   .sec-depth { margin-left: 0; width: 100%; }
   .sec-depth::before { display: none; }
