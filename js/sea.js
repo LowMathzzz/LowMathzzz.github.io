@@ -144,7 +144,10 @@ void main(){
 const U = {};
 let gl = null, g2 = null, texSky, texFg;
 function initGL() {
-  const g = seaC.getContext('webgl', { alpha: false, antialias: false, depth: false, stencil: false, powerPreference: 'low-power' }); if (!g) return null;
+  // sin GPU real (SwiftShader, llvmpipe, driver básico) el shader a pantalla completa va por CPU: mejor la composición 2D
+  const g = seaC.getContext('webgl', { alpha: false, antialias: false, depth: false, stencil: false, powerPreference: 'low-power', failIfMajorPerformanceCaveat: true }); if (!g) return null;
+  const dbg = g.getExtension('WEBGL_debug_renderer_info'), rend = dbg ? String(g.getParameter(dbg.UNMASKED_RENDERER_WEBGL)) : '';
+  if (/swiftshader|llvmpipe|softpipe|software|basic render/i.test(rend)) { g.getExtension('WEBGL_lose_context')?.loseContext(); return null; }
   const shd = (type, src) => { const s = g.createShader(type); g.shaderSource(s, src); g.compileShader(s);
     if (!g.getShaderParameter(s, g.COMPILE_STATUS)) throw g.getShaderInfoLog(s); return s; };
   const prog = g.createProgram();
@@ -164,7 +167,7 @@ function initGL() {
   return g;
 }
 try { gl = initGL(); } catch (e) { gl = null; }
-if (!gl) { const c = seaC.cloneNode(); seaC.replaceWith(c); seaC = c; g2 = seaC.getContext('2d'); }   // sin WebGL: composición simple en 2D
+if (!gl) { const c = seaC.cloneNode(); seaC.replaceWith(c); seaC = c; g2 = seaC.getContext('2d'); goLite(); }   // sin WebGL: composición simple en 2D y modo liviano
 function upload(unit, tex, canvas, premul) {
   gl.activeTexture(gl.TEXTURE0 + unit); gl.bindTexture(gl.TEXTURE_2D, tex);
   gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, premul);
@@ -1014,21 +1017,59 @@ class Tank {
 /* ---------- INMERSIÓN: al cruzar la superficie el agua se agita un momento y suben burbujas de a poco ---------- */
 let diveT = 99;
 const diveFx = document.getElementById('dive-fx');
-let diveOn = false;
-// el agua entra por los bordes de la pantalla un momento y se retira
+let diveOn = false, diveUp = false, drops = [];
+// al bajar, una ola pixel art sube por los bordes laterales en ~1,2 s; al subir, caen gotas por toda la pantalla
+const DIVE_END = 1.2, DROP_END = 1.6, WAVE_C = ['#0b4650', '#16727a', '#3fb8a8', '#c9fff3'];   // fondo, cuerpo, luz, espuma
+function startDive(up) {
+  diveT = 0; diveOn = true; diveUp = up; drops = [];
+  if (up) for (let i = 0, n = Math.round(AW / 7); i < n; i++)
+    drops.push({ x: rnd(2, AW - 3) | 0, y: rnd(-AH * .5, AH * .35), v: rnd(20, 70), d: rnd(0, .5) });
+}
+function drawDrops(dc, t) {
+  for (const p of drops) {
+    const s = t - p.d; if (s < 0) continue;
+    const y = Math.round(p.y + p.v * s + 140 * s * s); if (y < 0 || y > AH + 4) continue;
+    dc.fillStyle = WAVE_C[2]; dc.fillRect(p.x, y - 4, 1, 2);               // estela
+    dc.fillStyle = WAVE_C[3]; dc.fillRect(p.x, y - 2, 2, 2);               // gota
+    dc.fillStyle = WAVE_C[1]; dc.fillRect(p.x + 1, y - 1, 1, 1);           // sombra
+  }
+}
 function diveOverlay() {
   if (!diveFx) return;
-  if (!diveOn || diveT >= 1.6) { if (diveFx.classList.contains('on')) { diveFx.classList.remove('on'); diveFx.style.removeProperty('--dv'); } return; }
-  const v = diveT < .3 ? smooth(0, .3, diveT) : 1 - smooth(.3, 1.6, diveT);
-  diveFx.classList.add('on'); diveFx.style.setProperty('--dv', v.toFixed(3));
+  const dc = diveFx.getContext('2d'), end = diveUp ? DROP_END : DIVE_END;
+  if (!diveOn || diveT >= end) { if (diveFx.classList.contains('on')) { diveFx.classList.remove('on'); dc.clearRect(0, 0, diveFx.width, diveFx.height); } return; }
+  if (diveFx.width !== AW || diveFx.height !== AH) { diveFx.width = AW; diveFx.height = AH; }
+  diveFx.classList.add('on'); dc.clearRect(0, 0, AW, AH);
+  if (diveUp) { dc.globalAlpha = 1 - smooth(1.2, DROP_END, diveT); drawDrops(dc, diveT); return; }
+  const W0 = Math.max(8, Math.round(42 / SEA.px)), tail = AH * .55, t = diveT;
+  const head = AH + 10 - smooth(0, DIVE_END, t) * (AH + tail + 20);      // fila de la cresta, sube desde abajo
+  dc.globalAlpha = 1 - smooth(.85, DIVE_END, t);
+  for (let y = Math.max(0, head | 0); y < AH; y++) {
+    const d = y - head, e = d < 8 ? d / 8 : Math.max(0, 1 - (d - 8) / tail);
+    if (e <= 0) continue;
+    const w = Math.round(e * (W0 + 3 * Math.sin(y * .23 + t * 9) + 2 * Math.sin(y * .07 - t * 5)));
+    if (w < 1) continue;
+    const bands = [w - 6, w - 3, w - 1, w];                                  // del borde hacia adentro: fondo, cuerpo, luz y espuma en la punta
+    for (let i = 3; i >= 0; i--) {                                           // la más ancha primero, las angostas encima
+      const bw = bands[i]; if (bw <= 0) continue;
+      dc.fillStyle = WAVE_C[i];
+      dc.fillRect(0, y, bw, 1); dc.fillRect(AW - bw, y, bw, 1);
+    }
+    if (d < 10 && ((y * 7 + (t * 30 | 0)) % 5) === 0) {                      // gotas sueltas delante de la cresta
+      dc.fillStyle = WAVE_C[3]; const g = w + 2 + (y % 3);
+      dc.fillRect(g, y - 2, 1, 1); dc.fillRect(AW - 1 - g, y - 2, 1, 1);
+    }
+  }
 }
 const diveWave = t => t < .45 ? smooth(0, .45, t) : Math.exp(-(t - .45) * 1.5);   // sube suave y se apaga lento
 
 /* ---------- LOOP ---------- */
 layout();
-let last = performance.now(), skyT = -99, cloudT = -99, slow = 0;
+let last = performance.now(), skyT = -99, cloudT = -99, slow = 0, prevRaf = 0, gapAvg = 16;
 function frame(now) {
   requestAnimationFrame(frame);
+  const gap = now - prevRaf; prevRaf = now;
+  if (gap < 250) gapAvg += (gap - gapAvg) * .05;                            // ritmo real de frames (incluye GPU y composición, no solo el JS)
   if (!SEA.ready) { last = now; return; }
   if (now - last < 1000 / SEA.fps - 3) return;                              // móvil: 30 fps sobran para una pecera
   const oy = Math.round(scrollY / SEA.px), paused = SEA.paused;
@@ -1046,9 +1087,9 @@ function frame(now) {
     composeSky(t); if (gl) upload(0, texSky, skyC, false);
   }
   const sub = top > SEA.surf - 30;                                           // la línea del agua ya pasó el borde superior
-  if (SEA.sub !== undefined && sub !== SEA.sub && !SEA.reduced) { diveT = 0; diveOn = !paused; }
+  if (SEA.sub !== undefined && sub !== SEA.sub && !SEA.reduced) { if (paused) { diveT = 0; diveOn = false; } else startDive(!sub); }
   SEA.sub = sub; diveT += dt; SEA.waveBoost = diveWave(diveT); diveOverlay();
-  if (diveT < 1.2 && BG.bubbles.length < 260 && Math.random() < dt * (SEA.lite ? 14 : 28))
+  if (diveT < 1.2 && sub && BG.bubbles.length < 260 && Math.random() < dt * (SEA.lite ? 14 : 28))
     BG.bubbles.push({ x: rnd(0, SEA.vw), y: top + SEA.vh * rnd(.8, 1.1), r: rnd(0, 2) | 0, v: rnd(110, 220), ph: rnd(0, 6) });
   updateWater(BG, dt, t); updateMotes(dt, t);
   if (sub && vy > 250 && BG.bubbles.length < 260)                           // al bajar rápido, las burbujas suben a tu lado
@@ -1064,6 +1105,6 @@ function frame(now) {
   drawUI(t);
   for (const tk of TANKS) if (tk.visible && (!paused || !tk.drawn)) { tk.frame(dt, t); tk.drawn = true; }
   if (SEA.onTick) SEA.onTick(t);
-  if (!SEA.lite) { slow = performance.now() - t0 > 12 ? slow + 1 : Math.max(0, slow - 1); if (slow > 40) goLite(); }   // si el equipo no da abasto, baja solo a modo liviano
+  if (!SEA.lite) { slow = performance.now() - t0 > 12 || gapAvg > 30 ? slow + 1 : Math.max(0, slow - 1); if (slow > 40) goLite(); }   // si el equipo no da abasto (JS o GPU), baja solo a modo liviano
 }
 requestAnimationFrame(frame);
