@@ -6,8 +6,8 @@ const SEA = {
   reduced: matchMedia('(prefers-reduced-motion: reduce)').matches, onTick: null, onLayout: null,
   lite: document.documentElement.classList.contains('lite'),                 // móvil / equipo modesto: lo decide el <head>
 };
-SEA.fps = SEA.lite ? 30 : 60;
-function goLite() { SEA.lite = true; SEA.fps = 30; document.documentElement.classList.add('lite'); }
+SEA.fps = 60;                                                                 // fps al hacer scroll; quieta la pecera va a 30 (ver fpsNow)
+function goLite() { SEA.lite = true; document.documentElement.classList.add('lite'); }
 
 /* ---------- TRABAJO DIFERIDO: los sprites se generan de a uno en ratos libres, sin congelar el arranque ---------- */
 const JOBS = [], idle = window.requestIdleCallback ? f => requestIdleCallback(f, { timeout: 300 }) : f => setTimeout(f, 16);
@@ -815,6 +815,8 @@ function layout() {
   const de = document.documentElement, vw = de.clientWidth, vh = seaWrap.clientHeight, px = vw < 700 ? 2 : 3;
   if (!vw || !vh) return;                                                   // pestaña oculta: se reintenta en el próximo resize
   const rebuild = vw !== SEA.vw || px !== SEA.px;
+  // en el móvil la barra del navegador aparece y se esconde al hacer scroll y dispara resize: si el tamaño (lvh) y la página no cambiaron, no se rehace nada
+  if (SEA.ready && !rebuild && vh === SEA.vh && de.scrollHeight === SEA.doc) return;
   SEA.px = BG.px = px; SEA.vw = vw; SEA.vh = vh; SEA.doc = de.scrollHeight;
   SEA.k = clamp(vw / 1700, .5, 1.1);
   const name = document.getElementById('name');
@@ -827,8 +829,8 @@ function layout() {
     seaC.style.width = AW * px + 'px'; seaC.style.height = AH * px + 'px';
     if (gl) gl.viewport(0, 0, AW, AH);
   }
-  DPR = Math.min(2, devicePixelRatio || 1);
-  uiC.width = Math.round(vw * DPR); uiC.height = Math.round(vh * DPR);
+  DPR = Math.min(SEA.lite ? 1.5 : 2, devicePixelRatio || 1);                 // en móvil, 1.5x: casi la mitad de píxeles que pintar por frame
+  if (uiC.width !== Math.round(vw * DPR) || uiC.height !== Math.round(vh * DPR)) { uiC.width = Math.round(vw * DPR); uiC.height = Math.round(vh * DPR); }
   BG.lim = { x0: 30, x1: vw - 30 };
   measureBands(); buildName();
   if (rebuild) buildBed();
@@ -878,7 +880,7 @@ addEventListener('keydown', e => {
 let plantT = -1, plantsOk = false;
 function drawFg(t) {
   const c = fx, px = SEA.px, top = SEA.oy * px, bot = top + SEA.vh, bedVis = SEA.bedTop < bot + 60;
-  if (bedVis && (t - plantT > (SEA.lite ? 1 / 12 : 1 / 30) || !plantsOk)) {  // las plantas se mecen lento: no hace falta redibujarlas cada frame
+  if (bedVis && (t - plantT > (SEA.lite ? 1 / 12 : 1 / 15) || !plantsOk)) {  // las plantas se mecen lento: no hace falta redibujarlas cada frame
     plantT = t; plantsOk = true;
     for (const [cv, layer] of [[plB, 0], [plF, 1]]) {
       const pc = bedCtx(cv); pc.lineCap = 'butt';
@@ -1065,15 +1067,26 @@ const diveWave = t => t < .45 ? smooth(0, .45, t) : Math.exp(-(t - .45) * 1.5); 
 
 /* ---------- LOOP ---------- */
 layout();
-let last = performance.now(), skyT = -99, cloudT = -99, slow = 0, prevRaf = 0, gapAvg = 16;
+let last = performance.now(), skyT = -99, cloudT = -99, slow = 0, prevRaf = 0, vsync = 16.7, lag = 1, scrollAt = 0;
+// 60 fps solo mientras se hace scroll (el fondo tiene que seguir a la página); quieta, la pecera va a 30 fps y gasta la mitad
+addEventListener('scroll', () => { scrollAt = performance.now(); }, { passive: true });
+const fpsNow = now => now - scrollAt < 700 ? SEA.fps : Math.min(SEA.fps, 30);
+// en pantallas de 120-240 Hz no se pide un frame en cada refresco: se duerme con setTimeout hasta poco antes del próximo dibujo
+// (cada requestAnimationFrame obliga al navegador a componer un frame)
 function frame(now) {
-  requestAnimationFrame(frame);
   const gap = now - prevRaf; prevRaf = now;
-  if (gap < 250) gapAvg += (gap - gapAvg) * .05;                            // ritmo real de frames (incluye GPU y composición, no solo el JS)
+  if (gap > 2) vsync = Math.min(vsync * 1.001, gap);                         // período de refresco de la pantalla (el menor salto visto)
+  tick(now);
+  const wait = last + 1000 / fpsNow(now) - performance.now() - vsync * 1.5;
+  if (wait > 1) setTimeout(() => requestAnimationFrame(frame), wait); else requestAnimationFrame(frame);
+}
+function tick(now) {
   if (!SEA.ready) { last = now; return; }
-  if (now - last < 1000 / SEA.fps - 3) return;                              // móvil: 30 fps sobran para una pecera
+  const fps = fpsNow(now);
+  if (now - last < 1000 / fps - 3) return;
   const oy = Math.round(scrollY / SEA.px), paused = SEA.paused;
   if (paused && BG.drawn && oy === SEA.oy && !SEA.skyDirty && TANKS.every(tk => tk.drawn || !tk.visible)) { last = now; return; }   // en pausa solo se redibuja si algo cambió
+  if (now - last < 250) lag += ((now - last) * fps / 1000 - lag) * .05;      // ritmo real de dibujo vs. el pedido (incluye GPU y composición, no solo el JS)
   const t0 = performance.now(), dt = paused ? 0 : Math.min((now - last) / 1000, .066) * (SEA.reduced ? .5 : 1); last = now;
   const t = tNow += dt, top = oy * SEA.px, vy = dt ? (top - BG.view.top) / dt : 0;   // velocidad del scroll (px/s)
   SEA.scroll = scrollY; SEA.oy = oy; BG.drawn = true;
@@ -1105,6 +1118,7 @@ function frame(now) {
   drawUI(t);
   for (const tk of TANKS) if (tk.visible && (!paused || !tk.drawn)) { tk.frame(dt, t); tk.drawn = true; }
   if (SEA.onTick) SEA.onTick(t);
-  if (!SEA.lite) { slow = performance.now() - t0 > 12 || gapAvg > 30 ? slow + 1 : Math.max(0, slow - 1); if (slow > 40) goLite(); }   // si el equipo no da abasto (JS o GPU), baja solo a modo liviano
+  slow = performance.now() - t0 > 12 || lag > 1.8 ? slow + 1 : Math.max(0, slow - 1);   // si el equipo no da abasto (JS o GPU) baja de a un escalón:
+  if (slow > 40) { slow = 0; lag = 1; if (!SEA.lite) goLite(); else if (SEA.fps > 30) SEA.fps = 30; }   // primero sin desenfoques, después 30 fps también al hacer scroll
 }
 requestAnimationFrame(frame);
