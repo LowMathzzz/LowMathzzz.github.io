@@ -14,10 +14,10 @@ const EN = {
   'hero.lede': 'I design and build secure backends with Java and Spring Boot, and cross-platform apps with Flutter.',
   'hero.open': 'Open to new opportunities', 'hero.where': 'Lima, Peru · remote or on-site', 'hero.time': 'Time in Lima',
   'hero.cta1': "Let's talk", 'hero.cta2': 'View résumé', 'hero.dive': 'Dive', 'hud.fish': 'fish',
-  'hero.hint': 'This is a real fish tank: <b>click</b> to feed, move fast and they flee, stay still and they come closer. <b>F</b> feeds · <b>T</b> knocks on the glass.',
-  'profile.p0': 'I build secure, scalable backends with Java and Spring Boot, and cross-platform apps with Flutter.',
-  'profile.p1': "I'm into API security: JWT authentication, role-based access control, data encryption and hardening. I design with hexagonal and Clean Architecture so the domain never depends on the framework, and reach for Kafka when services need to talk through events without coupling.",
-  'profile.p2': "I ship with Docker and CI/CD pipelines on GitHub Actions and Jenkins, tested with JUnit and Mockito, running on AWS and Azure with Grafana to see what's happening live. I study Software Engineering at UPC (Lima) and I'm training as a Backend Developer.",
+  'hero.hint': '<b>Click or tap</b> to feed · Move the mouse fast to startle<br>Keyboard: <kbd>F</kbd> feeds · <kbd>T</kbd> knocks on the glass',
+  'profile.p0': 'I developed AAS-NET, a CRM for an insurance brokerage, from the data model through delivery.',
+  'profile.p1': 'That project involved policies, clients and different access roles. I enforced permissions on every endpoint and encrypted data at rest to protect client and policy data.',
+  'profile.p2': "I now develop DoxaCore to manage restaurant and grill operations. I study Software Engineering at UPC, with graduation expected in 2027, and continue my training as a Backend Developer.",
   'now.title': 'Right now', 'now.1': 'Looking for my next backend or mobile role', 'now.2': 'Training as a Backend Developer',
   'now.4': 'Studying Software Engineering at UPC (graduating 2027)',
   'about.card': 'Species card', 'about.k1': 'Habitat', 'about.v1': 'Lima, Peru · open to remote', 'about.k2': 'Interests',
@@ -25,15 +25,19 @@ const EN = {
   'about.k5': 'Education', 'about.v5': 'Software Engineering — UPC (2022 – 2027)', 'about.k6': 'Status', 'about.v6': 'Open to new challenges',
   'tab1.s': 'CRM · 2025 – 2026', 'tab2.s': 'Restaurants · 2025 – present',
   'c1.when': 'Dec 2025 — Sep 2026', 'c1.sub': 'CRM for insurance brokers', 'c1.mode': 'Remote, occasionally on-site', 'c1.status': 'Delivered',
-  'c1.desc': "A platform that runs the brokerage's entire operation from a single system: policies, installments and renewals, claims, clients, sub-agents and exportable reports. I built it end to end: data model, API, security, deployment and delivery.",
+  'c1.desc': "I built the brokerage's CRM: policies, installments and renewals, claims, clients, sub-agents and exportable reports. I handled the data model, API, security, deployment and delivery.",
+  'c1.flow.title': 'Access to the insurance portfolio', 'c1.flow.1': 'Sub-agents, administrative staff and managers',
+  'c1.flow.2': 'API · JWT and role-based permissions', 'c1.flow.3': 'Clients, policies and claims',
   'c1.b1': 'Modular Spring Boot 3 / Java 21 backend with a REST API documented in OpenAPI and a PostgreSQL data model for the whole portfolio.',
   'c1.s1': 'Stateless authentication with Spring Security and JWT, plus API hardening: input validation, rate limiting and secure headers.',
-  'c1.s2': 'Role-based access control (RBAC) for sub-agents, administrative staff and managers, enforced on every endpoint.',
+  'c1.s2': 'I enforced role-based access control (RBAC) on every endpoint to check what each user can read or change.',
   'c1.s3': 'Encryption of sensitive data at rest and hardened frontend security to protect client and policy data.',
   'c1.d2': 'Docker containers and a CI/CD pipeline on GitHub Actions; remote work coordinated with the on-site team.',
   'c2.kind': 'Personal project', 'c2.status': 'In development', 'c2.when': '2025 — present', 'c2.sub': 'Operations management for restaurants and grills', 'c2.role': 'Design and full development',
-  'c2.desc': "A modular SaaS platform for restaurants' and grills' daily operations: attendance and payroll, expenses and accounts payable, sales reconciliation, recipe-based inventory and goods receiving, all from one dashboard.",
-  'c2.b1': 'Automatic ingestion of Excel files (biometric logs, sales reports and supplier orders) with Apache POI and asynchronous processing.',
+  'c2.desc': 'I am developing a SaaS platform for restaurants and grills: attendance and payroll, expenses and accounts payable, sales reconciliation, recipe-based inventory and goods receiving.',
+  'c2.flow.title': 'From attendance logs to payroll', 'c2.flow.1': 'Excel · biometric attendance logs',
+  'c2.flow.2': 'Apache POI · asynchronous processing', 'c2.flow.3': 'Late arrivals, deductions and salaries',
+  'c2.b1': 'I use Apache POI to process attendance, sales and supplier order spreadsheets, working with the files the operation already generates.',
   'c2.b2': 'Calculation engine for late arrivals, deductions and salaries from that data, with no manual spreadsheets.',
   'c2.b3': 'React and TypeScript frontend with sales, cost and staff dashboards.',
   'c2.s1': 'Encryption of sensitive data and role-based access control with Spring Security.',
@@ -57,8 +61,8 @@ const EN = {
   foot: 'Handmade with HTML, Canvas and WebGL.', accent: 'Main color',
 };
 const TXT = {
-  es: { day: 'día', night: 'noche', dawn: 'amanecer', dusk: 'atardecer', copied: '¡Email copiado!', sent: 'Botella lanzada: revisa tu correo', modes: ['Ciclo real: sigue tu hora local', 'Siempre de día', 'Siempre de noche'], motion: ['Pausar animación', 'Reanudar animación'] },
-  en: { day: 'day', night: 'night', dawn: 'dawn', dusk: 'dusk', copied: 'Email copied!', sent: 'Bottle thrown: check your email app', modes: ['Real cycle: follows your local time', 'Always day', 'Always night'], motion: ['Pause animation', 'Resume animation'] },
+  es: { day: 'día', night: 'noche', dawn: 'amanecer', dusk: 'atardecer', copied: 'Email copiado', sent: 'Botella lanzada: revisa tu correo', modes: ['Ciclo real: sigue tu hora local', 'Siempre de día', 'Siempre de noche'], motion: ['Pausar animación', 'Reanudar animación'] },
+  en: { day: 'day', night: 'night', dawn: 'dawn', dusk: 'dusk', copied: 'Email copied', sent: 'Bottle thrown: check your email app', modes: ['Real cycle: follows your local time', 'Always day', 'Always night'], motion: ['Pause animation', 'Resume animation'] },
 };
 const tx = k => TXT[SEA.lang][k];
 const setText = (el, v) => { v = String(v); if (el.textContent !== v) el.textContent = v; };   // escribir solo si cambió: no invalida el layout
@@ -110,7 +114,7 @@ setInterval(clock, 2000);
 // las posiciones se miden solo cuando cambia el layout; por frame se usan transforms (no fuerzan layout)
 const SECS = ['top', 'profile', 'work', 'tech', 'background', 'contact'];
 const CM = 60;   // la pecera mide 60 cm de la superficie al fondo
-const G = { val: $('#depth-val'), gauge: $('.gauge'), track: $('.gauge-track'), fill: $('.gauge-fill'), fish: $('.gauge-fish'), bar: $('.nav-progress'), nav: $('#nav'), links: $$('.gauge-marks a, .nav-links a') };
+const G = { val: $('#depth-val'), gauge: $('.gauge'), track: $('.gauge-track'), fill: $('.gauge-fill'), fish: $('.gauge-fish'), bar: $('.nav-progress'), links: $$('.gauge-marks a, .nav-links a') };
 const progressAt = y => clamp((y - SEA.surf) / (SEA.floor0 - SEA.surf), 0, 1);
 const secTop = id => { const el = document.getElementById(id); return el ? el.getBoundingClientRect().top + scrollY : 0; };
 let tops = [], trackH = 0, maxY = 1;
@@ -123,7 +127,7 @@ function placeMarks() {
   lastP = -1;
 }
 SEA.onLayout = placeMarks;
-let lastY = 0, lastP = -1, lastB = -1, lastSec = '', solid = null, nightAttr = null;
+let lastY = 0, lastP = -1, lastB = -1, lastSec = '', nightAttr = null;
 SEA.onTick = () => {
   const y = scrollY, p = progressAt(y + SEA.vh * .5), b = clamp(y / maxY, 0, 1);
   if (Math.abs(b - lastB) > .0005) { lastB = b; G.bar.style.transform = `scaleX(${b.toFixed(4)})`; }   // barra de progreso: reemplaza al scroll oculto
@@ -137,7 +141,6 @@ SEA.onTick = () => {
   if (Math.abs(y - lastY) > 2) { G.fish.classList.toggle('left', y < lastY); lastY = y; }
   let cur = 'top'; for (const [id, top] of tops) if (top <= y + SEA.vh * .45) cur = id;
   if (cur !== lastSec) { lastSec = cur; for (const a of G.links) a.classList.toggle('active', a.getAttribute('href') === '#' + cur); }
-  if ((y > 40) !== solid) { solid = y > 40; G.nav.classList.toggle('solid', solid); }
   const night = SEA.night > .55;
   if (night !== nightAttr) { nightAttr = night; document.documentElement.toggleAttribute('data-night', night); }
 };
@@ -147,10 +150,6 @@ function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.ad
 /* ---------- MENÚ MÓVIL ---------- */
 $('#menu-btn').addEventListener('click', () => { const open = $('#nav').classList.toggle('open'); $('#menu-btn').setAttribute('aria-expanded', String(open)); });
 for (const a of $$('.nav-links a')) a.addEventListener('click', () => { $('#nav').classList.remove('open'); $('#menu-btn').setAttribute('aria-expanded', 'false'); });
-
-/* ---------- APARECER AL HACER SCROLL ---------- */
-const io = new IntersectionObserver(es => { for (const e of es) if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }, { threshold: .12 });
-for (const el of $$('.reveal')) io.observe(el);
 
 /* ---------- TECNOLOGÍAS: cada una se dibuja con los colores de su marca ---------- */
 const TECH = {

@@ -95,7 +95,7 @@ float caus(vec2 p){
 float shaft(vec2 w){
   float dy=max(w.y-uSurf,0.); vec2 d=normalize(vec2(uDir.x*.72,uDir.y));
   float xb=w.x-d.x/d.y*dy, st=.5+.5*sin(xb*.045+uT*.15)*sin(xb*.11-uT*.1+1.);
-  return st*st*1.5*exp(-dy/1100.);
+  return st*st*.45*exp(-dy/1100.);
 }
 void main(){
   vec2 a=vec2(gl_FragCoord.x, uRes.y-gl_FragCoord.y);                 // pixel de arte, origen arriba a la izquierda
