@@ -10,14 +10,15 @@ const EMAIL = 'mateoloechle@outlook.com';
 /* ---------- TEXTOS EN INGLÉS (el español vive en el HTML) ---------- */
 const EN = {
   skip: 'Skip to content', 'nav.label': 'Sections', 'nav.profile': 'About me', 'nav.work': 'Projects', 'nav.tech': 'Technologies',
-  'nav.bg': 'Background', 'nav.contact': 'Contact', 'nav.menu': 'Menu', gauge: 'Depth', 'g.top': 'Surface',
+  'nav.bg': 'Background', 'nav.contact': 'Contact', 'nav.menu': 'Menu', 'brand.home': 'Mateo Loechle — home', gauge: 'Depth', 'g.top': 'Surface',
   'hero.lede': 'I design and build secure backends with Java and Spring Boot, and cross-platform apps with Flutter.',
   'hero.open': 'Open to new opportunities', 'hero.where': 'Lima, Peru · remote or on-site', 'hero.time': 'Time in Lima',
   'hero.cta1': "Let's talk", 'hero.cta2': 'View résumé', 'hero.dive': 'Dive', 'hud.fish': 'fish',
-  'hero.hint': '<b>Click or tap</b> to feed · Move the mouse fast to startle<br>Keyboard: <kbd>F</kbd> feeds · <kbd>T</kbd> knocks on the glass',
-  'profile.p0': 'I design secure, distributed backends: systems that stay up when one piece fails.',
-  'profile.p1': 'I build microservices in Java, Go, Python and TypeScript with DDD and a database per service. I coordinate them through RabbitMQ messaging, the outbox pattern and idempotent consumers; I ingest IoT telemetry over MQTT, and I secure them behind an API Gateway with JWT, role-based access control and rate limiting.',
-  'profile.p2': 'On the client side I build web apps with Next.js and mobile apps with Flutter, and I ship with Docker, GitHub Actions CI/CD and AWS. I study Software Engineering at UPC (Lima).',
+  'hero.hint': '<b>Click or tap the water</b> to feed', 'hero.mouse': 'Move the mouse fast to startle',
+  'hero.keys': 'With this help focused: <kbd>F</kbd> feeds · <kbd>T</kbd> knocks on the glass', 'tank.controls': 'Aquarium controls',
+  'profile.p0': 'I build secure, scalable backends with Java and Spring Boot, and cross-platform apps with Flutter.',
+  'profile.p1': "I'm into API security: JWT authentication, role-based access control, data encryption and hardening. I design with hexagonal and Clean Architecture so the domain never depends on the framework, and reach for Kafka when services need to talk through events without coupling.",
+  'profile.p2': "I ship with Docker and CI/CD pipelines on GitHub Actions and Jenkins, tested with JUnit and Mockito, running on AWS and Azure with Grafana to see what's happening live. I study Software Engineering at UPC (Lima) and I'm training as a Backend Developer.",
   'now.title': 'Right now', 'now.1': 'Looking for my next backend or mobile role', 'now.2': 'Training as a Backend Developer',
   'now.4': 'Studying Software Engineering at UPC (graduating 2027)',
   'about.card': 'Species card', 'about.k1': 'Habitat', 'about.v1': 'Lima, Peru · open to remote', 'about.k2': 'Interests',
@@ -33,6 +34,7 @@ const EN = {
   'c1.s2': 'I enforced role-based access control (RBAC) on every endpoint to check what each user can read or change.',
   'c1.s3': 'Encryption of sensitive data at rest and hardened frontend security to protect client and policy data.',
   'c1.d2': 'Docker containers and a CI/CD pipeline on GitHub Actions; remote work coordinated with the on-site team.',
+  'c1.private': 'For confidentiality, the company keeps the source code and internal operation of this system private.',
   'c2.kind': 'Personal project', 'c2.status': 'In development', 'c2.when': '2025 — present', 'c2.sub': 'Operations management for restaurants and grills', 'c2.role': 'Design and full development',
   'c2.desc': 'I am developing a SaaS platform for restaurants and grills: attendance and payroll, expenses and accounts payable, sales reconciliation, recipe-based inventory and goods receiving.',
   'c2.flow.title': 'From attendance logs to payroll', 'c2.flow.1': 'Excel · biometric attendance logs',
@@ -42,7 +44,9 @@ const EN = {
   'c2.b3': 'React and TypeScript frontend with sales, cost and staff dashboards.',
   'c2.s1': 'Encryption of sensitive data and role-based access control with Spring Security.',
   'c2.s2': 'Expiring sessions in Redis and rate limiting against abuse; deployed with Docker on AWS.',
-  'tech.sub': 'Languages, frameworks and platforms I work with. Filter by area or hover the list.', 'tech.filter': 'Filter by area',
+  'c2.private': 'The source code and internal operation of this project are kept private.',
+  'tech.sub': 'Technologies in high demand across software development, data and cloud.', 'tech.filter': 'Filter by area',
+  'tech.core': 'In-demand technologies', 'tech.more': 'Explore all technologies',
   'cat.all': 'All', 'cat.lang': 'Languages', 'cat.data': 'Data', 'tank.title': 'Click: food · fast mouse: they flee',
   'tech.arch': 'Architecture & patterns', 'tech.method': 'Methodologies & tools', 'pill.micro': 'Microservices', 'pill.hex': 'Hexagonal',
   'bg.cv': 'View full résumé', 'bg.org1': 'Arias y Arias Corredores de Seguros · Lima, Peru (remote)',
@@ -56,13 +60,14 @@ const EN = {
   'cert.micro': 'Microservices development', 'cert.cyber': 'Backend Developer', 'cert.wip': 'in progress',
   'contact.title': "Let's talk", 'contact.big': 'Got a project, a team or an idea that needs a solid backend? Write to me.',
   'contact.sub': 'Available for backend, mobile and full-stack roles — remote or in Lima.', 'contact.copy': 'copy',
-  'form.title': 'Message in a bottle', 'form.name': 'Name', 'form.msg': 'Message', 'form.ph': 'What are you working on?', 'form.send': 'Throw the bottle →',
-  'form.note': 'Your email app will open with the message ready to send.',
+  'form.title': 'Message in a bottle', 'form.name': 'Name', 'form.msg': 'Message', 'form.ph': 'What are you working on?', 'form.send': 'Prepare email',
+  'form.copy': 'Copy message', 'form.manual': 'Copy this text and send it to mateoloechle@outlook.com',
+  'form.note': 'This prepares a draft in your email app; it does not send the message from this website. You can also copy it and send it from your email.',
   foot: 'Handmade with HTML, Canvas and WebGL.', accent: 'Main color',
 };
 const TXT = {
-  es: { day: 'día', night: 'noche', dawn: 'amanecer', dusk: 'atardecer', copied: 'Email copiado', sent: 'Botella lanzada: revisa tu correo', modes: ['Ciclo real: sigue tu hora local', 'Siempre de día', 'Siempre de noche'], motion: ['Pausar animación', 'Reanudar animación'] },
-  en: { day: 'day', night: 'night', dawn: 'dawn', dusk: 'dusk', copied: 'Email copied', sent: 'Bottle thrown: check your email app', modes: ['Real cycle: follows your local time', 'Always day', 'Always night'], motion: ['Pause animation', 'Resume animation'] },
+  es: { day: 'día', night: 'noche', dawn: 'amanecer', dusk: 'atardecer', copied: 'Email copiado', draft: 'Borrador preparado. Si no se abrió tu correo, usa «Copiar mensaje». Todavía no se ha enviado.', copying: 'Copiando mensaje…', messageCopied: 'Mensaje copiado. Pégalo en tu correo y envíalo a mateoloechle@outlook.com.', manualCopy: 'No se pudo copiar automáticamente. Selecciona y copia el texto de abajo.', modes: ['Ciclo real: sigue tu hora local', 'Siempre de día', 'Siempre de noche'], motion: ['Pausar animación', 'Reanudar animación'] },
+  en: { day: 'day', night: 'night', dawn: 'dawn', dusk: 'dusk', copied: 'Email copied', draft: 'Draft prepared. If your email app did not open, use “Copy message”. Nothing has been sent yet.', copying: 'Copying message…', messageCopied: 'Message copied. Paste it into your email and send it to mateoloechle@outlook.com.', manualCopy: 'Automatic copying failed. Select and copy the text below.', modes: ['Real cycle: follows your local time', 'Always day', 'Always night'], motion: ['Pause animation', 'Resume animation'] },
 };
 const tx = k => TXT[SEA.lang][k];
 const setText = (el, v) => { v = String(v); if (el.textContent !== v) el.textContent = v; };   // escribir solo si cambió: no invalida el layout
@@ -80,7 +85,7 @@ function setLang(l) {
     el.setAttribute(attr, l === 'en' ? (EN[key] ?? el.dataset[k]) : el.dataset[k]);
   }
   for (const b of $$('[data-lang]')) b.setAttribute('aria-pressed', String(b.dataset.lang === l));
-  themeUI(); motionUI(); clock();
+  themeUI(); motionUI(); clock(); setText($('#form-status'), '');
 }
 for (const b of $$('[data-lang]')) b.addEventListener('click', () => setLang(b.dataset.lang));
 
@@ -96,7 +101,12 @@ $('#theme-btn').addEventListener('click', () => {
 });
 
 /* ---------- PAUSAR EL FONDO (contenido en movimiento: WCAG 2.2.2) ---------- */
-function motionUI() { setText($('#motion-btn'), tx('motion')[SEA.paused ? 1 : 0]); document.documentElement.classList.toggle('paused', SEA.paused); }
+function motionUI() {
+  const b = $('#motion-btn'), label = tx('motion')[SEA.paused ? 1 : 0];
+  b.setAttribute('aria-label', label); b.title = label;
+  b.querySelector('use').setAttribute('href', SEA.paused ? '#i-play' : '#i-pause');
+  document.documentElement.classList.toggle('paused', SEA.paused);
+}
 $('#motion-btn').addEventListener('click', () => { SEA.paused = !SEA.paused; store.set('motion', SEA.paused ? 'off' : 'on'); motionUI(); });
 
 /* ---------- HUD DE LA PECERA Y HORA EN LIMA ---------- */
@@ -148,8 +158,24 @@ let toastT = 0;
 function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2200); }
 
 /* ---------- MENÚ MÓVIL ---------- */
-$('#menu-btn').addEventListener('click', () => { const open = $('#nav').classList.toggle('open'); $('#menu-btn').setAttribute('aria-expanded', String(open)); });
-for (const a of $$('.nav-links a')) a.addEventListener('click', () => { $('#nav').classList.remove('open'); $('#menu-btn').setAttribute('aria-expanded', 'false'); });
+function setMenu(open) {
+  $('#nav').classList.toggle('open', open);
+  $('#menu-btn').setAttribute('aria-expanded', String(open));
+}
+$('#menu-btn').addEventListener('click', () => {
+  const open = !$('#nav').classList.contains('open'); setMenu(open);
+  if (open) $('.nav-links a').focus();
+});
+for (const a of $$('#nav a')) a.addEventListener('click', () => {
+  if ($('#nav').classList.contains('open')) { setMenu(false); $('#menu-btn').focus(); }
+});
+addEventListener('click', e => { if (!$('#nav').contains(e.target)) setMenu(false); });
+addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  if ($('#accent').classList.contains('open')) {
+    $('#accent').classList.remove('open'); $('#accent-btn').setAttribute('aria-expanded', 'false'); $('#accent-btn').focus();
+  } else if ($('#nav').classList.contains('open')) { setMenu(false); $('#menu-btn').focus(); }
+});
 
 /* ---------- TECNOLOGÍAS: cada una se dibuja con los colores de su marca ---------- */
 const TECH = {
@@ -221,16 +247,36 @@ for (const b of $$('[data-copy]')) b.addEventListener('click', () => {
 });
 
 const BOTTLE = '<svg viewBox="0 0 11 19"><path fill="#b98a5a" d="M4 0h3v2H4z"/><path fill="#9fe6d8" d="M4 2h3v3h1v1h1v1h1v11H1V7h1V6h1V5h1z"/><path fill="#f6efd8" d="M3 9h5v6H3z"/><path fill="#fff" d="M2 8h1v4H2z"/></svg>';
-$('#bottle').addEventListener('submit', e => {
-  e.preventDefault();
-  const f = e.target, d = new FormData(f), name = String(d.get('name')).trim(), from = String(d.get('email')).trim();
+function bottleDraft() {
+  const d = new FormData($('#bottle')), name = String(d.get('name')).trim(), from = String(d.get('email')).trim();
   const subject = (SEA.lang === 'en' ? 'Hi Mateo — message from ' : 'Hola Mateo — mensaje de ') + name;
   const body = `${String(d.get('msg')).trim()}\n\n— ${name} · ${from}`;
-  const r = f.querySelector('.btn').getBoundingClientRect(), b = document.createElement('div');
-  b.className = 'bottle-fly'; b.innerHTML = BOTTLE; b.style.left = r.left + r.width / 2 + 'px'; b.style.top = r.top - 20 + 'px';
-  document.body.appendChild(b); setTimeout(() => b.remove(), 2600);
-  toast(tx('sent'));
+  return { subject, body };
+}
+$('#bottle').addEventListener('submit', e => {
+  e.preventDefault();
+  const { subject, body } = bottleDraft();
+  if (!SEA.paused && !SEA.reduced) {
+    const r = e.target.querySelector('.btn').getBoundingClientRect(), b = document.createElement('div');
+    b.className = 'bottle-fly'; b.innerHTML = BOTTLE; b.style.left = r.left + r.width / 2 + 'px'; b.style.top = r.top - 20 + 'px';
+    document.body.appendChild(b); setTimeout(() => b.remove(), 2600);
+  }
+  setText($('#form-status'), tx('draft'));
   location.href = `mailto:${EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+});
+$('#copy-message').addEventListener('click', async () => {
+  if (!$('#bottle').reportValidity()) return;
+  const { subject, body } = bottleDraft(), text = `${EMAIL}\n${subject}\n\n${body}`;
+  setText($('#form-status'), tx('copying'));
+  $('#copy-message').disabled = true;
+  let copyTimer;
+  try {
+    await Promise.race([navigator.clipboard.writeText(text), new Promise((_, reject) => { copyTimer = setTimeout(reject, 1500); })]);
+    $('#copy-fallback').hidden = true; setText($('#form-status'), tx('messageCopied'));
+  } catch {
+    $('#copy-fallback').hidden = false; $('#copy-text').value = text;
+    $('#copy-text').focus(); $('#copy-text').select(); setText($('#form-status'), tx('manualCopy'));
+  } finally { clearTimeout(copyTimer); $('#copy-message').disabled = false; }
 });
 
 /* ---------- COLOR PRINCIPAL ---------- */

@@ -869,8 +869,8 @@ addEventListener('click', e => {
   if (e.clientX < 24 || e.clientX > SEA.vw - 24) { tocToc(x, y); return; }   // toc toc en el vidrio
   dropFood(BG, x, y);
 });
-addEventListener('keydown', e => {
-  if (e.ctrlKey || e.metaKey || e.altKey || (e.target.closest && e.target.closest('input,textarea,select,[contenteditable]'))) return;
+document.getElementById('aquarium-controls').addEventListener('keydown', e => {
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
   const has = M.cy > -1e3, x = has ? M.x : SEA.vw / 2, y = has ? M.y : scrollY + SEA.vh * .45;
   if (e.key === 'f' || e.key === 'F') dropFood(BG, x, y);
   else if (e.key === 't' || e.key === 'T') tocToc(x, y);

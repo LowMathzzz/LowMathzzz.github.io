@@ -16,7 +16,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- Proxima Nova es de pago (Adobe Fonts): si tienes un kit, agrega aquí su <link> de use.typekit.net y se usará sola. Mientras tanto, Figtree. -->
 <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600&family=Pixelify+Sans:wght@700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=2">
+<link rel="stylesheet" href="css/styles.css?v=4">
 <script>(function (d, n) { var c = d.documentElement.classList; c.add('js');   // modo liviano: táctil, pantalla chica, pocos núcleos o ahorro de datos
   if (matchMedia('(pointer: coarse)').matches || innerWidth < 700 || (n.hardwareConcurrency || 8) <= 4 || (n.connection && n.connection.saveData)) c.add('lite'); })(document, navigator)</script>
 </head>
@@ -34,10 +34,13 @@
   <symbol id="i-cv" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M6 2h9l5 5v15H6z M14 2v6h6 M9 13h7 M9 17h7"/></symbol>
   <symbol id="i-badge" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M12 2a6 6 0 1 0 0 12 6 6 0 0 0 0-12z M8.5 13l-1.5 8 5-3 5 3-1.5-8"/></symbol>
   <symbol id="i-book" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M4 4.5A1.5 1.5 0 0 1 5.5 3H20v15H5.5A1.5 1.5 0 0 0 4 19.5z M4 19.5A1.5 1.5 0 0 0 5.5 21H20v-3"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" d="M8 5v14M16 5v14"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="m8 5 11 7-11 7z"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></symbol>
 </svg>
 
 <header class="nav" id="nav">
-  <a class="brand" href="#top" aria-label="Mateo Loechle — inicio">
+  <a class="brand" href="#top" aria-label="Mateo Loechle — inicio" data-i18n-attr="aria-label:brand.home">
     <svg class="fish-ico" aria-hidden="true"><use href="#i-fish"/></svg>
     <span>lowmath<b>.dev</b></span>
   </a>
@@ -47,14 +50,8 @@
     <a href="#tech" data-i18n="nav.tech">Tecnologías</a>
     <a href="#background" data-i18n="nav.bg">Trayectoria</a>
     <a href="#contact" data-i18n="nav.contact">Contacto</a>
-  </nav>
-  <div class="nav-tools">
-    <div class="seg" role="group" aria-label="Idioma / Language">
-      <button type="button" data-lang="es" aria-pressed="true">ES</button>
-      <button type="button" data-lang="en" aria-pressed="false">EN</button>
-    </div>
     <div class="accent" id="accent">
-      <button type="button" class="icon-btn accent-btn" id="accent-btn" aria-expanded="false" aria-controls="accent-menu" aria-label="Color principal" data-i18n-attr="aria-label:accent"><i aria-hidden="true"></i></button>
+      <button type="button" class="icon-btn accent-btn" id="accent-btn" aria-expanded="false" aria-controls="accent-menu" aria-label="Color principal" data-i18n-attr="aria-label:accent"><i aria-hidden="true"></i><span data-i18n="accent">Color principal</span></button>
       <div class="accent-menu" id="accent-menu" role="group" aria-label="Color principal" data-i18n-attr="aria-label:accent">
         <button type="button" data-accent-set="agua" style="--c:#6fe3cf" aria-label="Agua" title="Agua"></button>
         <button type="button" data-accent-set="coral" style="--c:#ff8f73" aria-label="Coral" title="Coral"></button>
@@ -64,8 +61,15 @@
         <button type="button" data-accent-set="ambar" style="--c:#ffd25a" aria-label="Ámbar" title="Ámbar"></button>
       </div>
     </div>
+  </nav>
+  <div class="nav-tools">
+    <div class="seg" role="group" aria-label="Idioma / Language">
+      <button type="button" data-lang="es" aria-pressed="true">ES</button>
+      <button type="button" data-lang="en" aria-pressed="false">EN</button>
+    </div>
     <button type="button" class="icon-btn" id="theme-btn" aria-label="Ciclo día/noche"><span aria-hidden="true">◐</span></button>
-    <button type="button" class="icon-btn menu-btn" id="menu-btn" aria-expanded="false" aria-controls="nav-links" aria-label="Menú" data-i18n-attr="aria-label:nav.menu"><span aria-hidden="true">≡</span></button>
+    <button type="button" class="icon-btn" id="motion-btn" aria-label="Pausar animación"><svg aria-hidden="true"><use href="#i-pause"/></svg></button>
+    <button type="button" class="icon-btn menu-btn" id="menu-btn" aria-expanded="false" aria-controls="nav-links" aria-label="Menú" data-i18n-attr="aria-label:nav.menu"><svg aria-hidden="true"><use href="#i-menu"/></svg></button>
   </div>
   <span class="nav-progress" aria-hidden="true"></span>
 </header>
@@ -113,7 +117,11 @@
     </div>
     <div class="wrap hero-foot">
       <p class="hud" aria-live="off"><span>26 °C</span><span>pH 7.0</span><span id="hud-time">--:--</span><span id="hud-mode">—</span><span><b id="hud-fish">0</b> <span data-i18n="hud.fish">peces</span></span></p>
-      <p class="hint" data-i18n="hero.hint"><b>Clic o toque</b> para alimentar · Mouse rápido para espantar<br>Teclado: <kbd>F</kbd> alimenta · <kbd>T</kbd> toca el vidrio</p>
+      <div class="hint" id="aquarium-controls" tabindex="0" role="group" aria-label="Controles de la pecera" data-i18n-attr="aria-label:tank.controls" data-nofeed>
+        <span data-i18n="hero.hint"><b>Clic o toque en el agua</b> para alimentar</span>
+        <span class="pointer-hint" data-i18n="hero.mouse">Mouse rápido para espantar</span>
+        <span class="keyboard-hint" data-i18n="hero.keys">Con esta ayuda enfocada: <kbd>F</kbd> alimenta · <kbd>T</kbd> toca el vidrio</span>
+      </div>
       <a class="dive" href="#profile"><span data-i18n="hero.dive">Bucea</span> <span class="arrow" aria-hidden="true">↓</span></a>
     </div>
   </section>
@@ -128,9 +136,9 @@
       </header>
       <div class="about-grid">
         <div class="panel about-text">
-          <p class="big" data-i18n="profile.p0">Diseño backends seguros y distribuidos: sistemas que siguen en pie cuando una pieza falla.</p>
-          <p data-i18n="profile.p1">Construyo microservicios en Java, Go, Python y TypeScript con DDD y una base de datos por servicio. Los coordino por mensajería con RabbitMQ, patrón outbox y consumidores idempotentes; ingiero telemetría IoT por MQTT, y los protejo detrás de un API Gateway con JWT, control de acceso por roles y rate limiting.</p>
-          <p data-i18n="profile.p2">Del lado del cliente desarrollo apps web con Next.js y móviles con Flutter, y despliego con Docker, CI/CD en GitHub Actions y AWS. Estudio Ingeniería de Software en la UPC (Lima).</p>
+          <p class="big" data-i18n="profile.p0">Construyo backends seguros y escalables con Java y Spring Boot, y apps multiplataforma con Flutter.</p>
+          <p data-i18n="profile.p1">Me apasiona la seguridad de las APIs: autenticación con JWT, control de acceso por roles, cifrado de datos y hardening. Diseño con arquitectura hexagonal y Clean Architecture para que el dominio nunca dependa del framework, y uso Kafka cuando los servicios necesitan hablar por eventos sin acoplarse.</p>
+          <p data-i18n="profile.p2">Llevo el código a producción con Docker y pipelines de CI/CD en GitHub Actions y Jenkins, probado con JUnit y Mockito, sobre AWS y Azure y con Grafana para ver en vivo qué pasa. Estudio Ingeniería de Software en la UPC (Lima) y me formo como Backend Developer.</p>
           <h3 class="tiny" data-i18n="now.title">Ahora mismo</h3>
           <ul class="fish-list">
             <li><svg class="mini-fish" aria-hidden="true"><use href="#i-fish"/></svg><span data-i18n="now.1">Buscando mi próximo rol de backend o mobile</span></li>
@@ -204,6 +212,7 @@
           </ul>
         </div>
         <ul class="tags"><li>Java 21</li><li>Spring Boot 3</li><li>Spring Security</li><li>PostgreSQL</li><li>JWT</li><li>OpenAPI</li><li>Docker</li><li>GitHub Actions</li></ul>
+        <p class="project-private" data-i18n="c1.private">Por confidencialidad, la empresa mantiene privados el código y el funcionamiento interno del sistema.</p>
       </article>
 
       <article class="panel project" id="doxacore" role="tabpanel" aria-labelledby="tab-doxa">
@@ -237,6 +246,7 @@
           </ul>
         </div>
         <ul class="tags"><li>Java 21</li><li>Spring Boot 3</li><li>PostgreSQL</li><li>Redis</li><li>React</li><li>TypeScript</li><li>Docker</li><li>AWS</li></ul>
+        <p class="project-private" data-i18n="c2.private">El código y el funcionamiento interno de este proyecto se mantienen privados.</p>
       </article>
     </div>
   </section>
@@ -249,8 +259,13 @@
         <h2 data-i18n="nav.tech">Tecnologías</h2>
         <span class="sec-depth">▼ <b data-depth="tech">0</b> cm</span>
       </header>
-      <p class="sec-sub" data-i18n="tech.sub">Lenguajes, frameworks y plataformas con los que trabajo. Filtra por área o pasa el mouse por la lista.</p>
+      <p class="sec-sub" data-i18n="tech.sub">Tecnologías con alta demanda en desarrollo de software, datos y cloud.</p>
       <div class="panel stack-panel">
+        <ul class="core-stack" aria-label="Tecnologías destacadas en el mercado laboral" data-i18n-attr="aria-label:tech.core">
+          <li>Python</li><li>JavaScript</li><li>TypeScript</li><li>Java</li><li>SQL</li><li>React</li><li>AWS</li><li>Docker</li>
+        </ul>
+        <details class="stack-details">
+          <summary data-i18n="tech.more">Explorar todas las tecnologías</summary>
         <div class="chips" role="group" aria-label="Filtrar por área" data-i18n-attr="aria-label:tech.filter">
           <button type="button" class="chip" data-cat="all" aria-pressed="true" data-i18n="cat.all">Todos</button>
           <button type="button" class="chip" data-cat="lang" aria-pressed="false" data-i18n="cat.lang">Lenguajes</button>
@@ -308,6 +323,7 @@
             <ul class="pills"><li>Git</li><li>Git Flow</li><li>Maven</li><li>Scrum</li><li>PMBOK</li><li>CI/CD</li></ul>
           </div>
         </div>
+        </details>
       </div>
     </div>
   </section>
@@ -386,11 +402,18 @@
         </div>
         <form class="panel bottle" id="bottle">
           <h3 data-i18n="form.title">Mensaje en una botella</h3>
+          <p class="form-note" id="form-note" data-i18n="form.note">Esto prepara un borrador en tu aplicación de correo; no envía el mensaje desde esta web. También puedes copiarlo y enviarlo desde tu correo.</p>
           <label><span data-i18n="form.name">Nombre</span><input name="name" required autocomplete="name" maxlength="80"></label>
           <label><span>Email</span><input name="email" type="email" required autocomplete="email" maxlength="120"></label>
           <label><span data-i18n="form.msg">Mensaje</span><textarea name="msg" rows="5" required maxlength="2000" placeholder="¿En qué estás trabajando?" data-i18n-attr="placeholder:form.ph"></textarea></label>
-          <button class="btn" type="submit" data-i18n="form.send">Lanzar la botella →</button>
-          <p class="form-note" data-i18n="form.note">Se abrirá tu correo con el mensaje listo para enviar.</p>
+          <div class="form-actions">
+            <button class="btn" type="submit" aria-describedby="form-note" data-i18n="form.send">Preparar correo</button>
+            <button class="btn btn-ghost" id="copy-message" type="button" data-i18n="form.copy">Copiar mensaje</button>
+          </div>
+          <p class="form-note" id="form-status" role="status"></p>
+          <div id="copy-fallback" hidden>
+            <label><span data-i18n="form.manual">Copia este texto y envíalo a mateoloechle@outlook.com</span><textarea id="copy-text" rows="6" readonly></textarea></label>
+          </div>
         </form>
       </div>
     </div>
@@ -401,14 +424,13 @@
   <div class="wrap">
     <p>© <span id="year">2026</span> Mateo Loechle · Lima, Perú</p>
     <p data-i18n="foot">Hecho a mano con HTML, Canvas y WebGL.</p>
-    <button type="button" class="link-btn" id="motion-btn">Pausar animación</button>
   </div>
 </footer>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="js/sprites.js"></script>
-<script src="js/sea.js?v=2"></script>
-<script src="js/app.js?v=2"></script>
+<script src="js/sea.js?v=3"></script>
+<script src="js/app.js?v=5"></script>
 </body>
 </html>
